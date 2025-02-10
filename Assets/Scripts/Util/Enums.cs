@@ -11,6 +11,7 @@ public enum Layers
     Water,
     UI,
     Tanc,
+    Weapon,
 }
 
 public enum WeaponSlot

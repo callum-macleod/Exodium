@@ -4,12 +4,14 @@ using UnityEngine;
 using System;
 using UnityEditor;
 using UnityEngine.UIElements;
+using UnityEditor.PackageManager.UI;
 
 public class Tanc : MonoBehaviour
 {
     // self references
     Rigidbody rigidBody;
     [SerializeField] Transform HorizontalRotator;
+    [SerializeField] Transform VerticalRotator;
     [SerializeField] Transform weaponSpace;
 
     // states
@@ -20,13 +22,17 @@ public class Tanc : MonoBehaviour
     public Vector3 Move { get; private set; }
     bool inAir = true;
 
-    WeaponSlot equippedWeapon;
+    WeaponSlot equippedWeaponSlot;
 
     Dictionary<WeaponSlot, GameObject> weapons = new Dictionary<WeaponSlot, GameObject>();
 
     public GameObject testingprimaryweapon;
     public GameObject testingsecondaryweapon;
     public GameObject hands;
+
+    // detecting nearby weapons
+    float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
+    float weaponPickupAngle = 1f - (50f / 90f);  // the angle within which you can pick up a weapon (i.e. how accurate you need to aim at it)
 
 
     void Awake()
@@ -55,10 +61,30 @@ public class Tanc : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3))
             EquipWeapon(WeaponSlot.Melee);
 
-        // testing picking up weapons
-        if (Input.GetKeyDown(KeyCode.F))
-            PickupWeapon(testingprimaryweapon, WeaponSlot.Primary);
+        // drop weapon
         if (Input.GetKeyDown(KeyCode.G))
+            DropWeapon(equippedWeaponSlot);
+
+        // pickup weapon
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            GameObject selectedWeapon = null;
+            float minDot = weaponPickupAngle;
+
+            if (Physics.SphereCast(VerticalRotator.position, 1f, VerticalRotator.forward, out RaycastHit hit, pickupRange, Utils.LayerToLayerMask(Layers.Weapon)))
+            {
+                if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
+                {
+                    PickupWeapon(hit.collider.gameObject, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
+                }
+            }
+            //DetectPickup();
+        }
+
+        // testing with prefabs
+        if (Input.GetKeyDown(KeyCode.F1))
+            PickupWeapon(testingprimaryweapon, WeaponSlot.Primary);
+        if (Input.GetKeyDown(KeyCode.F2))
             PickupWeapon(testingsecondaryweapon, WeaponSlot.Secondary);
     }
 
@@ -75,8 +101,10 @@ public class Tanc : MonoBehaviour
 
         // if falling, fall with increased (2x) gravity
         if (rigidBody.velocity.y <= 0)
-            rigidBody.AddForce(Physics.gravity, ForceMode.Acceleration);
+            rigidBody.AddForce(Physics.gravity / 2, ForceMode.Acceleration);
     }
+
+
     void CalculateMovement()
     {
         // redistribute velocity
@@ -102,6 +130,7 @@ public class Tanc : MonoBehaviour
             rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
     }
 
+
     public void EquipWeapon(WeaponSlot slot)
     {
         // if no weapon in that slot: do nothing
@@ -109,22 +138,57 @@ public class Tanc : MonoBehaviour
             return;
 
         // unequip current weapon
-        if (weapons.TryGetValue(equippedWeapon, out fuckoff))
-            weapons[equippedWeapon].SetActive(false);
+        if (weapons.TryGetValue(equippedWeaponSlot, out fuckoff))
+            weapons[equippedWeaponSlot].SetActive(false);
 
         // equip new weapon
-        equippedWeapon = slot;
-        weapons[equippedWeapon].SetActive(true);
+        equippedWeaponSlot = slot;
+        weapons[equippedWeaponSlot].SetActive(true);
     }
 
     public void PickupWeapon(GameObject weapon, WeaponSlot slot)
     {
         if (weapon.GetComponent<WeaponBase>() == null)
             throw new Exception("Tried to equip an object without a weapon component");
+        
+        // drop weapon in the desired slot
+        DropWeapon(slot);
 
-        weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+        // if weapon is a prefab
+        if (weapon.gameObject.scene.rootCount == 0)
+        {
+            weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+        }
+        // if weapon already exists in scene
+        else
+        {
+            weapon.transform.parent = weaponSpace.transform;
+            weapons[slot] = weapon;
+        }
+
+        weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+        weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
         weapons[slot].SetActive(false);
+        weapons[slot].transform.localPosition = Vector3.zero;
+        weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
+
+    public void DropWeapon(WeaponSlot slot)
+    {
+        // if no weapon in slot: do nothing
+        if (!weapons.TryGetValue(slot, out GameObject fuckoff))
+            return;
+
+        GameObject droppedWeapon = weapons[slot];
+        weapons.Remove(slot);
+
+        droppedWeapon.transform.parent = null;
+        droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
+        droppedWeapon.GetComponent<WeaponBase>().IsDetached = true;
+        //droppedWeapon.transform.rotation = transform.localRotation;
+        droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
+    }
+
 
     private void OnCollisionEnter(Collision collision)
     {

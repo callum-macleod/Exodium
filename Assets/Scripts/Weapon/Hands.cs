@@ -4,26 +4,13 @@ using UnityEngine;
 
 public class Hands : WeaponBase
 {
+    public override WeaponSlot WeaponSlot { get; } = WeaponSlot.Melee;
+
     protected override int baseDamage { get; set; } = 30;
     protected override float critMultiplier { get; set; } = 2f;
     protected override float limbMultiplier { get; set; } = 1f;
 
     public override void Shoot()
-    {
-
-    }
-
-    protected override void OnFixedUpdate()
-    {
-
-    }
-
-    protected override void OnStart()
-    {
-
-    }
-
-    protected override void OnUpdate()
     {
 
     }
