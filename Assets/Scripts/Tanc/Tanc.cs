@@ -11,7 +11,7 @@ public class Tanc : MonoBehaviour
     // self references
     Rigidbody rigidBody;
     [SerializeField] Transform HorizontalRotator;
-    [SerializeField] Transform VerticalRotator;
+    [SerializeField] public Transform VerticalRotator { get; private set; }
     [SerializeField] Transform weaponSpace;
 
     // states

@@ -16,7 +16,6 @@ public abstract class WeaponBase : MonoBehaviour
     [SerializeField] Rigidbody rigidbody { get; set; }
     [SerializeField] Collider collider { get; set; }
 
-    //float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
 
     [NonSerialized] public Tanc? AttachedTanc;
 
@@ -34,7 +33,6 @@ public abstract class WeaponBase : MonoBehaviour
             else if (AttachedTanc == null)
                 throw new NullReferenceException();
 
-            //collider.enabled = value;
             if (collider != null) collider.enabled = value;
             if (rigidbody != null) rigidbody.isKinematic = !value;
             isDetached = value;
@@ -54,16 +52,10 @@ public abstract class WeaponBase : MonoBehaviour
     }
 
     void Update() => OnUpdate();
-    protected virtual void OnUpdate()
-    {
-
-    }
+    protected virtual void OnUpdate() { }
 
     void FixedUpdate() => OnFixedUpdate();
-    protected virtual void OnFixedUpdate()
-    {
-
-    }
+    protected virtual void OnFixedUpdate() { }
 
 
     public abstract void Shoot();
