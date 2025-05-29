@@ -24,11 +24,11 @@ public class TRifle : WeaponBase
     {
         print($"{name}: Shooting");
         
-        if (Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
-        {
-            if (hit.collider.gameObject.layer == (int)Layers.Tanc)
-                print("Tanc hit!");
-            hit.point
-        }
+        //if (Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
+        //{
+        //    if (hit.collider.gameObject.layer == (int)Layers.Tanc)
+        //        print("Tanc hit!");
+        //    //hit.point
+        //}
     }
 }
