@@ -8,10 +8,12 @@ public class NadeScript : NetworkBehaviour
     [SerializeField] private NetworkObject explosion;
 
 
+
     private void Start()
     {
         GetComponent<Rigidbody>().velocity = transform.forward * 10f;
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -23,6 +25,7 @@ public class NadeScript : NetworkBehaviour
 
         Destroy(this.gameObject);
     }
+
 
     [Rpc(SendTo.Everyone)]
     public void InitializeTransformRpc(Vector3 pos, Quaternion rot)

@@ -167,17 +167,21 @@ public class Tanc : NetworkBehaviour
         // drop weapon in the desired slot
         DropWeapon(slot);
 
-        // if weapon is a prefab
-        if (weapon.gameObject.scene.rootCount == 0)
-        {
-            weapons[slot] = Instantiate(weapon, weaponSpace.transform);
-        }
-        // if weapon already exists in scene
-        else
-        {
-            weapon.transform.parent = weaponSpace.transform;
-            weapons[slot] = weapon;
-        }
+        weapon.transform.position = Vector3.zero;
+        weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+
+
+        //// if weapon is a prefab
+        //if (weapon.gameObject.scene.rootCount == 0)
+        //{
+        //    weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+        //}
+        //// if weapon already exists in scene
+        //else
+        //{
+        //    //weapon.transform.parent = weaponSpace.transform;
+        //    //weapons[slot] = weapon;
+        //}
 
         weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
         weapons[slot].GetComponent<WeaponBase>().IsDetached = false;

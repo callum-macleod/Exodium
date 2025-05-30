@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public abstract class WeaponBase : MonoBehaviour
+public abstract class WeaponBase : NetworkBehaviour
 {
     // weapon stats
     protected abstract int baseDamage { get; set; }
@@ -19,10 +20,10 @@ public abstract class WeaponBase : MonoBehaviour
 
     [NonSerialized] public Tanc? AttachedTanc;
 
-    private bool isDetached = false;
+    private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false);
 
     public bool IsDetached {
-        get { return isDetached; }
+        get { return isDetached.Value; }
         set
         {
             // if detaching: reset attached tanc
@@ -35,7 +36,7 @@ public abstract class WeaponBase : MonoBehaviour
 
             if (collider != null) collider.enabled = value;
             if (rigidbody != null) rigidbody.isKinematic = !value;
-            isDetached = value;
+            isDetached.Value = value;
         }
     }
 
