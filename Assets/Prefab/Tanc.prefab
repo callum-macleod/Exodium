@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3884698604
+  GlobalObjectIdHash: 4080243202
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -259,6 +259,7 @@ MonoBehaviour:
   testingprimaryweapon: {fileID: 6410100500443113811, guid: fb0177b50c1edf9499a7ee4ae31d5573, type: 3}
   testingsecondaryweapon: {fileID: 1535780860326277949, guid: 4ff3b47b1200f9f4b86dbf2152154dc4, type: 3}
   hands: {fileID: 7265506205423455575, guid: b6662ca2ffa1abe42a0536fb65f53c26, type: 3}
+  nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
 --- !u!114 &5121455351405466758
 MonoBehaviour:
   m_ObjectHideFlags: 0

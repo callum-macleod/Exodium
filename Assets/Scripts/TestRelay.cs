@@ -10,7 +10,7 @@ using Unity.Netcode.Transports.UTP;
 
 public class TestRelay : MonoBehaviour
 {
-    public string currentJoiningCode; 
+    private string currentJoiningCode; 
 
     public void setCurrentJoiningCode(string _newVal)
     {

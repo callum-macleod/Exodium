@@ -35,6 +35,11 @@ public class Tanc : NetworkBehaviour
     float weaponPickupAngle = 1f - (50f / 90f);  // the angle within which you can pick up a weapon (i.e. how accurate you need to aim at it)
 
 
+
+    //TEMP
+    public NetworkObject nade;
+
+
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
@@ -66,6 +71,10 @@ public class Tanc : NetworkBehaviour
         // drop weapon
         if (Input.GetKeyDown(KeyCode.G))
             DropWeapon(equippedWeaponSlot);
+
+        // throw nade
+        if (Input.GetKeyDown(KeyCode.E))
+            ThrowNadeRpc();
 
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
@@ -205,5 +214,15 @@ public class Tanc : NetworkBehaviour
 
         if (collision.gameObject.layer == (int)Layers.SolidGround)
             inAir = true;
+    }
+
+    [Rpc(SendTo.Server)]
+    private void ThrowNadeRpc()
+    {
+        NetworkObject nadeTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(nade, OwnerClientId);
+
+        nadeTemp.transform.position = VerticalRotator.transform.position + VerticalRotator.transform.forward * 2;
+        nadeTemp.transform.rotation = VerticalRotator.transform.rotation;
+
     }
 }
