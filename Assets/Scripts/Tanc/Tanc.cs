@@ -4,8 +4,9 @@ using UnityEngine;
 using System;
 using UnityEditor;
 using UnityEngine.UIElements;
+using Unity.Netcode;
 
-public class Tanc : MonoBehaviour
+public class Tanc : NetworkBehaviour
 {
     // self references
     Rigidbody rigidBody;
@@ -48,6 +49,8 @@ public class Tanc : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
+
         // jump
         if (Input.GetKeyDown(KeyCode.Space) && !inAir)
             rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
@@ -89,6 +92,8 @@ public class Tanc : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsOwner) return;
+
         // get directional inputs
         float xMov = Input.GetAxisRaw("Horizontal");
         float zMov = Input.GetAxisRaw("Vertical");

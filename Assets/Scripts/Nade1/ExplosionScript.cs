@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class ExplosionScript : MonoBehaviour
 {
-    [SerializeField] private float baseDamage = 100f;
+    [SerializeField] private float baseDamage = 90f;
 
     private void Awake()
     {

@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Rotator : MonoBehaviour
+public class Rotator : NetworkBehaviour
 {
     [SerializeField] Transform verticalRotator;
     private float xRotation;
@@ -10,6 +11,8 @@ public class Rotator : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
+
         float xRot = Input.GetAxisRaw("Mouse Y");
         float yRot = Input.GetAxisRaw("Mouse X");
 
