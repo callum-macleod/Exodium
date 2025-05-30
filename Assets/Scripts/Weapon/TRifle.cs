@@ -23,12 +23,14 @@ public class TRifle : WeaponBase
     public override void Shoot()
     {
         print($"{name}: Shooting");
-        
-        //if (Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
-        //{
-        //    if (hit.collider.gameObject.layer == (int)Layers.Tanc)
-        //        print("Tanc hit!");
-        //    //hit.point
-        //}
+
+        if (Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
+        {
+            if (hit.collider.gameObject.layer == (int)Layers.Tanc)
+                print("Tanc hit!");
+
+            if (hit.collider.GetComponent<HealthManager>() != null)
+                hit.collider.GetComponent<HealthManager>().ApplyDamage(baseDamage);
+        }
     }
 }
