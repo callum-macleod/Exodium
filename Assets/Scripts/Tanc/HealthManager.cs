@@ -1,34 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using UnityEngine.UI;
 
-public class HealthManager : MonoBehaviour
+public class HealthManager : NetworkBehaviour
 {
     [SerializeField] private int maxHealth = 100;
-    [SerializeField] private float currentHealth;
+    [SerializeField] private NetworkVariable<float> currentHealth;
 
-    private void Awake()
+    [SerializeField] private Slider healthSlider;
+
+    public override void OnNetworkSpawn()
     {
-        currentHealth = maxHealth;
+        currentHealth.OnValueChanged += UpdateHealthBar;
+
+        healthSlider.maxValue = maxHealth;
+        currentHealth.Value = maxHealth;
+        healthSlider.value = currentHealth.Value;
     }
+
+
+    private void UpdateHealthBar(float previous, float current)
+    {
+        healthSlider.value = current; // 
+    }
+
 
     public void ApplyDamage(float _dmg)
     {
         if (_dmg <= 0) return;
 
-        currentHealth -= _dmg;
+        currentHealth.Value -= _dmg;
 
-        if (currentHealth <= 0)
+        if (currentHealth.Value <= 0)
             Destroy(this.gameObject);
     }
+
 
     public void ApplyHeal(float _heal)
     {
         if (_heal <= 0) return;
 
-        currentHealth += _heal;
+        currentHealth.Value += _heal;
 
-        if (currentHealth >= maxHealth)
-            currentHealth = maxHealth;
+        if (currentHealth.Value >= maxHealth)
+            currentHealth.Value = maxHealth;
     }
 }
