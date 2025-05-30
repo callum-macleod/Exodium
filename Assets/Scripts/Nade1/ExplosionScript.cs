@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 // To Do:
@@ -9,20 +10,16 @@ public class ExplosionScript : MonoBehaviour
 {
     [SerializeField] private float baseDamage = 90f;
 
-    private void Awake()
-    {
-        // Explosion should only exist for short time, destroy it after that time.
-        Invoke(nameof(DestroyMe), 0.05f);
-    }
-
     private void OnTriggerEnter(Collider collider)
     {
         // Deal damage to every unit in range of collider.
         collider.GetComponent<HealthManager>().ApplyDamage((int)baseDamage);
     }
 
-    void DestroyMe()
+    [Rpc(SendTo.Everyone)]
+    public void InitializeTransformRpc(Vector3 pos, Quaternion rot)
     {
-        Destroy(gameObject);
+        transform.position = pos;
+        transform.rotation = rot;
     }
 }

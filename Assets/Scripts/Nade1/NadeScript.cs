@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class NadeScript : MonoBehaviour
+public class NadeScript : NetworkBehaviour
 {
-    [SerializeField] private GameObject explosion;
+    [SerializeField] private NetworkObject explosion;
 
 
     private void Start()
@@ -14,7 +16,19 @@ public class NadeScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Instantiate(explosion, transform.position, transform.rotation);
+        if (!IsServer) return;
+
+        NetworkObject explosionTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(explosion, OwnerClientId);
+
+        explosionTemp.GetComponent<NadeScript>().InitializeTransformRpc(transform.position, transform.rotation);
+
         Destroy(this.gameObject);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void InitializeTransformRpc(Vector3 pos, Quaternion rot)
+    {
+        transform.position = pos;
+        transform.rotation = rot;
     }
 }

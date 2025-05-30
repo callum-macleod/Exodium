@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 162338861713368}
   - component: {fileID: 2643785340005637076}
   - component: {fileID: 7057968992537390022}
-  - component: {fileID: 5449211467730631465}
   - component: {fileID: -2498562007505618183}
+  - component: {fileID: 5449211467730631465}
   - component: {fileID: -40322364766885592}
   m_Layer: 0
   m_Name: nade
@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 2920640511726868400}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.099793896, y: 4.11, z: 2.2844994}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,19 +136,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5449211467730631465
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2920640511726868400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2367da73de9fae2488067e35093dc7d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  explosion: {fileID: 1959212132236731982, guid: 97178b497dd87184b96476f5f19db199, type: 3}
 --- !u!114 &-2498562007505618183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,6 +157,19 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &5449211467730631465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2920640511726868400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2367da73de9fae2488067e35093dc7d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosion: {fileID: -8058493157734507094, guid: 97178b497dd87184b96476f5f19db199, type: 3}
 --- !u!114 &-40322364766885592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,9 +186,9 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0

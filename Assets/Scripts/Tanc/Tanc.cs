@@ -221,8 +221,6 @@ public class Tanc : NetworkBehaviour
     {
         NetworkObject nadeTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(nade, OwnerClientId);
 
-        nadeTemp.transform.position = VerticalRotator.transform.position + VerticalRotator.transform.forward * 2;
-        nadeTemp.transform.rotation = VerticalRotator.transform.rotation;
-
+        nadeTemp.GetComponent<NadeScript>().InitializeTransformRpc(VerticalRotator.transform.position + VerticalRotator.transform.forward * 2, VerticalRotator.transform.rotation);
     }
 }
