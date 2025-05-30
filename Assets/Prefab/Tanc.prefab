@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 3317747208427576892}
   - component: {fileID: 8546204257909267695}
   - component: {fileID: 5121455351405466758}
+  - component: {fileID: 8129290164739404589}
   m_Layer: 0
   m_Name: Tanc
   m_TagString: Untagged
@@ -289,6 +290,20 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &8129290164739404589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140893562268515772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1821f3171c10ded46bd4f24f1a644824, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectsToDisable:
+  - {fileID: 1413396710222959962}
 --- !u!1 &5293195895931659638
 GameObject:
   m_ObjectHideFlags: 0
