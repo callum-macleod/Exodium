@@ -115,6 +115,9 @@ public class Tanc : NetworkBehaviour
         // if falling, fall with increased (2x) gravity
         if (rigidBody.velocity.y <= 0)
             rigidBody.AddForce(Physics.gravity / 2, ForceMode.Acceleration);
+
+        weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
+        weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
     }
 
 
@@ -157,10 +160,6 @@ public class Tanc : NetworkBehaviour
         // equip new weapon
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
-
-        //weapons[equippedWeaponSlot].transform.parent = weaponSpace.transform;
-        weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
-        weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
     }
 
     public void PickupWeapon(GameObject weapon, WeaponSlot slot)
