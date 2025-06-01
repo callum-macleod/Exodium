@@ -22,7 +22,7 @@ public abstract class WeaponBase : NetworkBehaviour
 
     [SerializeField] public Tanc AttachedTanc;
 
-    private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public bool IsDetached {
         get { return isDetached.Value; }
