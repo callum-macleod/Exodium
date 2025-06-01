@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8428e945d375ec14fad31618863bce63, type: 3}
+  m_Name: WeaponLookup
+  m_EditorClassIdentifier: 
+  Dict:
+    _serializedList:
+    - Key: 0
+      Value: {fileID: -1594553294543259362, guid: b6662ca2ffa1abe42a0536fb65f53c26, type: 3}
+    - Key: 1
+      Value: {fileID: 8899659030154439314, guid: 4ff3b47b1200f9f4b86dbf2152154dc4, type: 3}
+    - Key: 2
+      Value: {fileID: 8537757115815610821, guid: fb0177b50c1edf9499a7ee4ae31d5573, type: 3}
