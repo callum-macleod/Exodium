@@ -79,7 +79,6 @@ public class Tanc : NetworkBehaviour
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
         {
-            GameObject selectedWeapon = null;
             float minDot = weaponPickupAngle;
 
             if (Physics.SphereCast(VerticalRotator.position, 1f, VerticalRotator.forward, out RaycastHit hit, pickupRange, Utils.LayerToLayerMask(Layers.Weapon)))
@@ -89,7 +88,6 @@ public class Tanc : NetworkBehaviour
                     PickupWeapon(hit.collider.gameObject, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
                 }
             }
-            //DetectPickup();
         }
 
         // testing with prefabs
@@ -171,33 +169,31 @@ public class Tanc : NetworkBehaviour
         DropWeapon(slot);
 
         WeaponBase _weapon = weapon.GetComponent<WeaponBase>();
-        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[_weapon.weaponIndex], OwnerClientId).gameObject;
-        weapons[slot].transform.position += Vector3.up * 3f;
-        //Destroy(weapons[slot].GetComponent<NetworkObject>());
-        //Destroy(weapons[slot].GetComponent<NetworkTransformCAuth>());
-        weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-        weapons[slot].GetComponent<Collider>().enabled = false;
-        //weapon.GetComponent<NetworkObject>().Despawn();
+        if (IsServer)
+        {
+            weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[_weapon.weaponIndex], OwnerClientId).gameObject;
+            weapons[slot].transform.position += Vector3.up * 3f;
+            weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+            weapons[slot].GetComponent<Collider>().enabled = false;
 
-        //// if weapon is a prefab
-        //if (weapon.gameObject.scene.rootCount == 0)
-        //{
-        //    weapons[slot] = Instantiate(weapon, weaponSpace.transform);
-        //}
-        //// if weapon already exists in scene
-        //else
-        //{
-        //    //weapon.transform.parent = weaponSpace.transform;
-        //    //weapons[slot] = weapon;
-        //}
+            weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+            weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+            weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
+            weapons[slot].SetActive(false);
+            weapons[slot].transform.localPosition = Vector3.zero;
+            weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+            print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+        }
+        else
+        {
+            PickupWeaponC2SRpc();
+        }
+    }
 
-        weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-        weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
-        weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
-        weapons[slot].SetActive(false);
-        weapons[slot].transform.localPosition = Vector3.zero;
-        weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
-        print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+    [Rpc(SendTo.Server)]
+    private void PickupWeaponC2SRpc()
+    {
+        Debug.Log("PickupWeaponC2SRpc");
     }
 
     public void DropWeapon(WeaponSlot slot)
@@ -212,7 +208,6 @@ public class Tanc : NetworkBehaviour
         droppedWeapon.transform.parent = null;
         droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
         droppedWeapon.GetComponent<WeaponBase>().IsDetached = true;
-        //droppedWeapon.transform.rotation = transform.localRotation;
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
     }
 

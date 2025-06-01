@@ -24,7 +24,5 @@ public class NetworkSpawner : NetworkBehaviour
         Debug.LogWarning("spawning shit");
         NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[2], OwnerClientId).gameObject.transform.position += Vector3.up;
         NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[1], OwnerClientId).gameObject.transform.position += Vector3.up;
-        //NetworkManager?.SpawnManager.InstantiateAndSpawn(triflePrefab, OwnerClientId);
-        //NetworkManager?.SpawnManager.InstantiateAndSpawn(spudPrefab, OwnerClientId);
     }
 }

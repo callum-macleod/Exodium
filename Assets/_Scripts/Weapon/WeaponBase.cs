@@ -16,8 +16,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
 
     // behaviour while detached from a tanc (i.e. on the floor)
-    [SerializeField] Rigidbody rigidbody { get; set; }
-    [SerializeField] Collider collider { get; set; }
+    [SerializeField] Rigidbody _rigidbody { get; set; }
+    [SerializeField] Collider _collider { get; set; }
 
 
     [SerializeField] public Tanc AttachedTanc;
@@ -36,8 +36,8 @@ public abstract class WeaponBase : NetworkBehaviour
             else if (AttachedTanc == null)
                 throw new NullReferenceException();
 
-            if (collider != null) collider.enabled = value;
-            if (rigidbody != null) rigidbody.isKinematic = !value;
+            if (_collider != null) _collider.enabled = value;
+            if (_rigidbody != null) _rigidbody.isKinematic = !value;
             isDetached.Value = value;
         }
     }
@@ -47,8 +47,8 @@ public abstract class WeaponBase : NetworkBehaviour
     void Start() => OnStart();
     protected virtual void OnStart()
     {
-        rigidbody = GetComponent<Rigidbody>();
-        collider = GetComponent<Collider>();
+        _rigidbody = GetComponent<Rigidbody>();
+        _collider = GetComponent<Collider>();
 
         if (StartAsDetached)
             IsDetached = true;
@@ -66,6 +66,6 @@ public abstract class WeaponBase : NetworkBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision != null && collision.gameObject.layer == (int)Layers.SolidGround)
-            rigidbody.isKinematic = true;
+            _rigidbody.isKinematic = true;
     }
 }
