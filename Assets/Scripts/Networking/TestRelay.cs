@@ -7,10 +7,14 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using System;
 
 public class TestRelay : MonoBehaviour
 {
+
     private string currentJoiningCode; 
+
+    public event EventHandler<HostStartedEventArgs> HostStarted;
 
     public void setCurrentJoiningCode(string _newVal)
     {
@@ -48,6 +52,10 @@ public class TestRelay : MonoBehaviour
             NetworkManager.Singleton.StartHost();
 
             print(joincode);
+
+
+            HostStarted += NetworkSpawner.Instance.Test;
+            HostStarted?.Invoke(this, new HostStartedEventArgs("kal", joincode));
         }
         catch (RelayServiceException e)
         {
@@ -78,4 +86,18 @@ public class TestRelay : MonoBehaviour
             Debug.Log(e);
         }
     }
+}
+
+
+
+public class HostStartedEventArgs : EventArgs
+{
+    public HostStartedEventArgs(string host, string code)
+    {
+        HostName = host;
+        JoinCode = code;
+    }
+
+    public string HostName;
+    public string JoinCode;
 }

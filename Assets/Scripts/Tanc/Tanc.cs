@@ -167,7 +167,9 @@ public class Tanc : NetworkBehaviour
         // drop weapon in the desired slot
         DropWeapon(slot);
 
-        weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+        NetworkObject no = weapon.GetComponent<NetworkObject>();
+        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(no, OwnerClientId).gameObject;
+        //weapons[slot] = Instantiate(weapon, weaponSpace.transform);
         weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
         weapons[slot].GetComponent<Collider>().enabled = false;
         Destroy(weapon);

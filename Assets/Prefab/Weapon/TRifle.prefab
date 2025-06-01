@@ -87,6 +87,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -96,7 +100,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4036014695239078565}
+      addedObject: {fileID: 8537757115815610821}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
       addedObject: {fileID: -1690045641167042408}
@@ -108,7 +112,7 @@ PrefabInstance:
       addedObject: {fileID: 5285731890985487575}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7628167446450050172}
+      addedObject: {fileID: 2145197616583752900}
   m_SourcePrefab: {fileID: 100100000, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
 --- !u!4 &6034419833842922473 stripped
 Transform:
@@ -120,7 +124,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
   m_PrefabInstance: {fileID: 6067520367352222722}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4036014695239078565
+--- !u!114 &8537757115815610821
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1980732348
+  GlobalObjectIdHash: 2321940435
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -153,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a20ecfc9d2c4c0419a3f03bd897ff71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AttachedTanc: {fileID: 0}
   StartAsDetached: 1
 --- !u!136 &8593088133392927745
 CapsuleCollider:
@@ -204,7 +209,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &7628167446450050172
+--- !u!114 &2145197616583752900
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
