@@ -158,11 +158,9 @@ public class Tanc : NetworkBehaviour
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
 
-        weapons[equippedWeaponSlot].transform.parent = weaponSpace.transform;
+        //weapons[equippedWeaponSlot].transform.parent = weaponSpace.transform;
         weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
         weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
-
-        weapons[equippedWeaponSlot].AddComponent<NetworkObject>();
     }
 
     public void PickupWeapon(GameObject weapon, WeaponSlot slot)
@@ -175,12 +173,12 @@ public class Tanc : NetworkBehaviour
 
         WeaponBase _weapon = weapon.GetComponent<WeaponBase>();
         weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[_weapon.weaponIndex], OwnerClientId).gameObject;
-        Destroy(weapons[slot].GetComponent<NetworkObject>());
+        weapons[slot].transform.position += Vector3.up * 3f;
+        //Destroy(weapons[slot].GetComponent<NetworkObject>());
         //Destroy(weapons[slot].GetComponent<NetworkTransformCAuth>());
-        //weapons[slot] = Instantiate(weapon, weaponSpace.transform);
         weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
         weapons[slot].GetComponent<Collider>().enabled = false;
-        weapon.GetComponent<NetworkObject>().Despawn();
+        //weapon.GetComponent<NetworkObject>().Despawn();
 
         //// if weapon is a prefab
         //if (weapon.gameObject.scene.rootCount == 0)
