@@ -25,6 +25,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
     private bool isDetached = false;
     //private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    //!!!! THIS IS NOT NETWORKED BECAUSE IT USES A CUSTOM SETTER
+    // IF YOU NEED TO CONVERT TO NETWORK VARIABLE, REPLACE THE CUSTOM SETTER WITH NetworkVariable.OnValueChanged!!!!
 
     public bool IsDetached {
         get { return isDetached; }
@@ -40,7 +42,7 @@ public abstract class WeaponBase : NetworkBehaviour
 
             if (_collider != null) _collider.enabled = value;
             if (_rigidbody != null) _rigidbody.isKinematic = !value;
-            //isDetached.Value = value;
+
             isDetached = value;
         }
     }
