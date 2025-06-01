@@ -167,10 +167,10 @@ public class Tanc : NetworkBehaviour
         // drop weapon in the desired slot
         DropWeapon(slot);
 
-        weapon.transform.position = Vector3.zero;
         weapons[slot] = Instantiate(weapon, weaponSpace.transform);
         weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
         weapons[slot].GetComponent<Collider>().enabled = false;
+        Destroy(weapon);
 
 
         //// if weapon is a prefab
