@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2321940435
+  GlobalObjectIdHash: 2267614376
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -157,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a20ecfc9d2c4c0419a3f03bd897ff71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponIndex: 2
   AttachedTanc: {fileID: 0}
   StartAsDetached: 1
 --- !u!136 &8593088133392927745

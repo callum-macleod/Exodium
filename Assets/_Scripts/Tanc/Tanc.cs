@@ -34,7 +34,7 @@ public class Tanc : NetworkBehaviour
     float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
     float weaponPickupAngle = 1f - (50f / 90f);  // the angle within which you can pick up a weapon (i.e. how accurate you need to aim at it)
 
-
+    [SerializeField] WeaponLookupSO weaponLookup;
 
     //TEMP
     public NetworkObject nade;
@@ -157,6 +157,12 @@ public class Tanc : NetworkBehaviour
         // equip new weapon
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
+
+        weapons[equippedWeaponSlot].transform.parent = weaponSpace.transform;
+        weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
+        weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
+
+        weapons[equippedWeaponSlot].AddComponent<NetworkObject>();
     }
 
     public void PickupWeapon(GameObject weapon, WeaponSlot slot)
@@ -167,13 +173,14 @@ public class Tanc : NetworkBehaviour
         // drop weapon in the desired slot
         DropWeapon(slot);
 
-        NetworkObject no = weapon.GetComponent<NetworkObject>();
-        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(no, OwnerClientId).gameObject;
+        WeaponBase _weapon = weapon.GetComponent<WeaponBase>();
+        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[_weapon.weaponIndex], OwnerClientId).gameObject;
+        Destroy(weapons[slot].GetComponent<NetworkObject>());
+        //Destroy(weapons[slot].GetComponent<NetworkTransformCAuth>());
         //weapons[slot] = Instantiate(weapon, weaponSpace.transform);
         weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
         weapons[slot].GetComponent<Collider>().enabled = false;
-        Destroy(weapon);
-
+        weapon.GetComponent<NetworkObject>().Despawn();
 
         //// if weapon is a prefab
         //if (weapon.gameObject.scene.rootCount == 0)

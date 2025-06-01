@@ -6,6 +6,8 @@ using Unity.Netcode;
 
 public abstract class WeaponBase : NetworkBehaviour
 {
+    public int weaponIndex;
+
     // weapon stats
     protected abstract int baseDamage { get; set; }
     protected abstract float critMultiplier { get; set; }

@@ -8,11 +8,13 @@ using Unity.Services.Relay.Models;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using System;
+using TMPro;
 
 public class TestRelay : MonoBehaviour
 {
+    public TMP_Text lobbyCodeDisplay;
 
-    private string currentJoiningCode; 
+    private string currentJoiningCode;
 
     public event EventHandler<HostStartedEventArgs> HostStarted;
 
@@ -51,7 +53,7 @@ public class TestRelay : MonoBehaviour
 
             NetworkManager.Singleton.StartHost();
 
-            print(joincode);
+            lobbyCodeDisplay.text = joincode;
 
 
             HostStarted += NetworkSpawner.Instance.Test;
