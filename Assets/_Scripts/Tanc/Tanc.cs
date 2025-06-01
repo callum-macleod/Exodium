@@ -48,7 +48,6 @@ public class Tanc : NetworkBehaviour
 
     private void Start()
     {
-        //PickupWeapon((int)Weapons.Hands, WeaponSlot.Melee);
         PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
         EquipWeapon(WeaponSlot.Melee);
     }
@@ -87,7 +86,6 @@ public class Tanc : NetworkBehaviour
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
-                    //PickupWeapon(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
                     PickupWeaponRpc(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
                 }
             }
@@ -160,14 +158,6 @@ public class Tanc : NetworkBehaviour
         weapons[equippedWeaponSlot].SetActive(true);
     }
 
-    private void PickupWeapon(Weapons weapon, WeaponSlot slot)
-    {
-        PickupWeaponRpc(weapon, slot);
-
-        if (IsServer)
-            Attach(weapons[slot], (int)weapon, slot);
-    }
-
     [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
     {        
@@ -179,14 +169,6 @@ public class Tanc : NetworkBehaviour
         weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[(int)weapon], OwnerClientId).gameObject;
         weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
     }
-
-    //[Rpc(SendTo.Server)]
-    //private void PickupWeaponC2SRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
-    //{
-    //    Debug.Log("PickupWeaponC2SRpc");
-    //    weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponID], OwnerClientId).gameObject;
-    //    weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
-    //}
 
     /// <summary>
     /// This is called by a weapon when it recieves it's AttachedWeaponNetObjID.
