@@ -23,22 +23,24 @@ public class HealthManager : NetworkBehaviour
 
     private void UpdateHealthBar(float previous, float current)
     {
-        healthSlider.value = current; // 
+        healthSlider.value = current;
     }
 
 
-    public void ApplyDamage(float _dmg)
+    [Rpc(SendTo.Server)]
+    public void ApplyDamageRpc(float _dmg)
     {
         if (_dmg <= 0) return;
 
         currentHealth.Value -= _dmg;
 
         if (currentHealth.Value <= 0)
-            Destroy(this.gameObject);
+            NetworkObject.Despawn();
     }
 
 
-    public void ApplyHeal(float _heal)
+    [Rpc(SendTo.Server)]
+    public void ApplyHealRpc(float _heal)
     {
         if (_heal <= 0) return;
 

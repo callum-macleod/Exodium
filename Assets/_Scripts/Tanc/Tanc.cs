@@ -48,7 +48,8 @@ public class Tanc : NetworkBehaviour
 
     private void Start()
     {
-        PickupWeapon(hands, WeaponSlot.Melee);
+        //PickupWeapon((int)Weapons.Hands, WeaponSlot.Melee);
+        PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
         EquipWeapon(WeaponSlot.Melee);
     }
 
@@ -86,16 +87,11 @@ public class Tanc : NetworkBehaviour
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
-                    PickupWeapon(hit.collider.gameObject, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
+                    //PickupWeapon(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
+                    PickupWeaponRpc(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
                 }
             }
         }
-
-        // testing with prefabs
-        if (Input.GetKeyDown(KeyCode.F1))
-            PickupWeapon(testingprimaryweapon, WeaponSlot.Primary);
-        if (Input.GetKeyDown(KeyCode.F2))
-            PickupWeapon(testingsecondaryweapon, WeaponSlot.Secondary);
     }
 
     private void FixedUpdate()
@@ -164,81 +160,40 @@ public class Tanc : NetworkBehaviour
         weapons[equippedWeaponSlot].SetActive(true);
     }
 
-    public void PickupWeapon(GameObject weapon, WeaponSlot slot)
+    private void PickupWeapon(Weapons weapon, WeaponSlot slot)
     {
-        if (weapon.GetComponent<WeaponBase>() == null)
-            throw new Exception("Tried to equip an object without a weapon component");
-        
-        // drop weapon in the desired slot
-        DropWeapon(slot);
+        PickupWeaponRpc(weapon, slot);
 
-        WeaponBase weaponBase = weapon.GetComponent<WeaponBase>();
         if (IsServer)
-        {
-            weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponBase.weaponID], OwnerClientId).gameObject;
-            weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
-
-            //weapons[slot].transform.position += Vector3.up * 3f;
-            //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-            //weapons[slot].GetComponent<Collider>().enabled = false;
-
-            //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-            //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
-            //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
-            //weapons[slot].SetActive(false);
-            //weapons[slot].transform.localPosition = Vector3.zero;
-            //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
-            //print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
-        }
-        else
-        {
-            // this is copy and paste, please make this more efficient
-
-            PickupWeaponC2SRpc(weaponBase.weaponID, OwnerClientId, slot);
-        }
+            Attach(weapons[slot], (int)weapon, slot);
     }
 
     [Rpc(SendTo.Server)]
-    private void PickupWeaponC2SRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
-    {
+    public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
+    {        
         Debug.Log("PickupWeaponC2SRpc");
-        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponID], OwnerClientId).gameObject;
+
+        // drop weapon in the desired slot
+        DropWeapon(slot);
+
+        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[(int)weapon], OwnerClientId).gameObject;
         weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
-
-        //weapons[slot].transform.position += Vector3.up * 3f;
-        //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-        //weapons[slot].GetComponent<Collider>().enabled = false;
-
-        //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-        //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
-        //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
-        //weapons[slot].SetActive(false);
-        //weapons[slot].transform.localPosition = Vector3.zero;
-        //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
-        //print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
-
-        //// tell clients to do the same
-        //PickupWeaponS2CRpc(weaponID, ownerClientID, slot);
     }
 
-    //[Rpc(SendTo.NotServer)]
-    //private void PickupWeaponS2CRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
+    //[Rpc(SendTo.Server)]
+    //private void PickupWeaponC2SRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
     //{
-    //    Debug.Log("PickupWeaponS2CRpc");
+    //    Debug.Log("PickupWeaponC2SRpc");
     //    weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponID], OwnerClientId).gameObject;
-    //    //weapons[slot].transform.position += Vector3.up * 3f;
-    //    //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-    //    //weapons[slot].GetComponent<Collider>().enabled = false;
-
-    //    //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-    //    //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
-    //    //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
-    //    //weapons[slot].SetActive(false);
-    //    //weapons[slot].transform.localPosition = Vector3.zero;
-    //    //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
-    //    print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+    //    weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
     //}
 
+    /// <summary>
+    /// This is called by a weapon when it recieves it's AttachedWeaponNetObjID.
+    /// </summary>
+    /// <param name="weapon"></param>
+    /// <param name="weaponID"></param>
+    /// <param name="slot"></param>
     public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
     {
         weapons[slot] = weapon;

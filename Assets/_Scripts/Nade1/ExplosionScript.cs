@@ -13,7 +13,7 @@ public class ExplosionScript : MonoBehaviour
     private void OnTriggerEnter(Collider collider)
     {
         // Deal damage to every unit in range of collider.
-        collider.GetComponent<HealthManager>().ApplyDamage((int)baseDamage);
+        collider.GetComponent<HealthManager>().ApplyDamageRpc((int)baseDamage);
     }
 
     [Rpc(SendTo.Everyone)]

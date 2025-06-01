@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 public abstract class WeaponBase : NetworkBehaviour
 {
-    public int weaponID;
+    public Weapons weaponID;
 
     // weapon stats
     protected abstract int baseDamage { get; set; }
@@ -49,9 +49,23 @@ public abstract class WeaponBase : NetworkBehaviour
 
     public bool StartAsDetached = false;
 
-    void Start() => OnStart();
-    protected virtual void OnStart()
+    //void Start() => OnStart();
+    //protected virtual void OnStart()
+    //{
+    //    _rigidbody = GetComponent<Rigidbody>();
+    //    _collider = GetComponent<Collider>();
+
+    //    if (StartAsDetached)
+    //        IsDetached = true;
+
+    //    AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
+    //}
+
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
+
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
@@ -60,6 +74,7 @@ public abstract class WeaponBase : NetworkBehaviour
 
         AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
     }
+
 
     private void OnAttachedTancNetObjIDChanged(ulong prev, ulong curr)
     {
@@ -73,7 +88,7 @@ public abstract class WeaponBase : NetworkBehaviour
             }
         }
 
-        AttachedTanc?.Attach(gameObject, weaponID, WeaponSlot);
+        AttachedTanc?.Attach(gameObject, (int)weaponID, WeaponSlot);
     }
 
     void Update() => OnUpdate();

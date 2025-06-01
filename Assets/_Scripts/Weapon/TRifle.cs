@@ -30,7 +30,7 @@ public class TRifle : WeaponBase
                 print("Tanc hit!");
 
             if (hit.collider.GetComponent<HealthManager>() != null)
-                hit.collider.GetComponent<HealthManager>().ApplyDamage(baseDamage);
+                hit.collider.GetComponent<HealthManager>().ApplyDamageRpc(baseDamage);
         }
     }
 }

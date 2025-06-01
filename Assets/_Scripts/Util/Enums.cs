@@ -20,3 +20,10 @@ public enum WeaponSlot
     Secondary,
     Melee
 }
+
+public enum Weapons
+{
+    Hands = 0,
+    Spud,
+    TRifle,
+}
