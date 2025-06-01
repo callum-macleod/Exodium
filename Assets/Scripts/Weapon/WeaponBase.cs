@@ -18,7 +18,7 @@ public abstract class WeaponBase : NetworkBehaviour
     [SerializeField] Collider collider { get; set; }
 
 
-    [NonSerialized] public Tanc? AttachedTanc;
+    [SerializeField] public Tanc AttachedTanc;
 
     private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false);
 

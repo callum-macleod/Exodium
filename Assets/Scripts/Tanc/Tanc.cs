@@ -169,6 +169,8 @@ public class Tanc : NetworkBehaviour
 
         weapon.transform.position = Vector3.zero;
         weapons[slot] = Instantiate(weapon, weaponSpace.transform);
+        weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+        weapons[slot].GetComponent<Collider>().enabled = false;
 
 
         //// if weapon is a prefab
@@ -185,9 +187,11 @@ public class Tanc : NetworkBehaviour
 
         weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
         weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+        weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
         weapons[slot].SetActive(false);
         weapons[slot].transform.localPosition = Vector3.zero;
         weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+        print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
     }
 
     public void DropWeapon(WeaponSlot slot)
