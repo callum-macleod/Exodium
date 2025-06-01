@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 public abstract class WeaponBase : NetworkBehaviour
 {
-    public int weaponIndex;
+    public int weaponID;
 
     // weapon stats
     protected abstract int baseDamage { get; set; }
@@ -21,11 +21,13 @@ public abstract class WeaponBase : NetworkBehaviour
 
 
     [SerializeField] public Tanc AttachedTanc;
+    public NetworkVariable<ulong> AttachedTancNetObjID { get; set; } = new NetworkVariable<ulong>();
 
-    private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    private bool isDetached = false;
+    //private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public bool IsDetached {
-        get { return isDetached.Value; }
+        get { return isDetached; }
         set
         {
             // if detaching: reset attached tanc
@@ -38,7 +40,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
             if (_collider != null) _collider.enabled = value;
             if (_rigidbody != null) _rigidbody.isKinematic = !value;
-            isDetached.Value = value;
+            //isDetached.Value = value;
+            isDetached = value;
         }
     }
 
@@ -52,6 +55,23 @@ public abstract class WeaponBase : NetworkBehaviour
 
         if (StartAsDetached)
             IsDetached = true;
+
+        AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
+    }
+
+    private void OnAttachedTancNetObjIDChanged(ulong prev, ulong curr)
+    {
+        // find attached tank using associated network object id
+        foreach (Tanc tanc in FindObjectsOfType(typeof(Tanc)))
+        {
+            if (tanc.GetComponent<NetworkObject>().NetworkObjectId == AttachedTancNetObjID.Value)
+            {
+                AttachedTanc = tanc;
+                break;
+            }
+        }
+
+        AttachedTanc?.Attach(gameObject, weaponID, WeaponSlot);
     }
 
     void Update() => OnUpdate();

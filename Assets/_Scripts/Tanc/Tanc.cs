@@ -5,6 +5,7 @@ using System;
 using UnityEditor;
 using UnityEngine.UIElements;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class Tanc : NetworkBehaviour
 {
@@ -171,32 +172,86 @@ public class Tanc : NetworkBehaviour
         // drop weapon in the desired slot
         DropWeapon(slot);
 
-        WeaponBase _weapon = weapon.GetComponent<WeaponBase>();
+        WeaponBase weaponBase = weapon.GetComponent<WeaponBase>();
         if (IsServer)
         {
-            weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[_weapon.weaponIndex], OwnerClientId).gameObject;
-            weapons[slot].transform.position += Vector3.up * 3f;
-            weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-            weapons[slot].GetComponent<Collider>().enabled = false;
+            weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponBase.weaponID], OwnerClientId).gameObject;
+            weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
 
-            weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-            weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
-            weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
-            weapons[slot].SetActive(false);
-            weapons[slot].transform.localPosition = Vector3.zero;
-            weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
-            print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+            //weapons[slot].transform.position += Vector3.up * 3f;
+            //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+            //weapons[slot].GetComponent<Collider>().enabled = false;
+
+            //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+            //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+            //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
+            //weapons[slot].SetActive(false);
+            //weapons[slot].transform.localPosition = Vector3.zero;
+            //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+            //print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
         }
         else
         {
-            PickupWeaponC2SRpc();
+            // this is copy and paste, please make this more efficient
+
+            PickupWeaponC2SRpc(weaponBase.weaponID, OwnerClientId, slot);
         }
     }
 
     [Rpc(SendTo.Server)]
-    private void PickupWeaponC2SRpc()
+    private void PickupWeaponC2SRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
     {
         Debug.Log("PickupWeaponC2SRpc");
+        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponID], OwnerClientId).gameObject;
+        weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
+
+        //weapons[slot].transform.position += Vector3.up * 3f;
+        //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+        //weapons[slot].GetComponent<Collider>().enabled = false;
+
+        //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+        //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+        //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
+        //weapons[slot].SetActive(false);
+        //weapons[slot].transform.localPosition = Vector3.zero;
+        //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+        //print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+
+        //// tell clients to do the same
+        //PickupWeaponS2CRpc(weaponID, ownerClientID, slot);
+    }
+
+    //[Rpc(SendTo.NotServer)]
+    //private void PickupWeaponS2CRpc(int weaponID, ulong ownerClientID, WeaponSlot slot)
+    //{
+    //    Debug.Log("PickupWeaponS2CRpc");
+    //    weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weaponID], OwnerClientId).gameObject;
+    //    //weapons[slot].transform.position += Vector3.up * 3f;
+    //    //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+    //    //weapons[slot].GetComponent<Collider>().enabled = false;
+
+    //    //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+    //    //weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+    //    //weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
+    //    //weapons[slot].SetActive(false);
+    //    //weapons[slot].transform.localPosition = Vector3.zero;
+    //    //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+    //    print(weapons[slot].GetComponent<WeaponBase>().AttachedTanc);
+    //}
+
+    public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
+    {
+        weapons[slot] = weapon;
+        weapons[slot].transform.position += Vector3.up * 3f;
+        weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+        weapons[slot].GetComponent<Collider>().enabled = false;
+
+        weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+        weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+        weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
+        weapons[slot].SetActive(false);
+        weapons[slot].transform.localPosition = Vector3.zero;
+        weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
     public void DropWeapon(WeaponSlot slot)

@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a20ecfc9d2c4c0419a3f03bd897ff71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponIndex: 2
+  weaponID: 2
   AttachedTanc: {fileID: 0}
   StartAsDetached: 1
 --- !u!136 &8593088133392927745
