@@ -114,8 +114,11 @@ public class Tanc : NetworkBehaviour
         if (rigidBody.velocity.y <= 0)
             rigidBody.AddForce(Physics.gravity / 2, ForceMode.Acceleration);
 
-        weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
-        weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
+        if (weapons.ContainsKey(equippedWeaponSlot))
+        {
+            weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
+            weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
+        }
     }
 
 
