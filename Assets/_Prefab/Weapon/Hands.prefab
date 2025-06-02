@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -923366971928503452}
   - component: {fileID: 6058876384389910593}
   - component: {fileID: 2577400686950731449}
-  - component: {fileID: -4755218811743272703}
+  - component: {fileID: -296023416599972927}
   m_Layer: 7
   m_Name: Hands
   m_TagString: Untagged
@@ -121,6 +121,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbf0690a1ae7d434abd21095613d1f15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponID: 0
+  AttachedTanc: {fileID: 0}
   StartAsDetached: 0
 --- !u!136 &6058876384389910593
 CapsuleCollider:
@@ -172,7 +174,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &-4755218811743272703
+--- !u!114 &-296023416599972927
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +183,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7265506205423455575}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 00beb0aac2974af41b834cd506bd5c1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   UseUnreliableDeltas: 0

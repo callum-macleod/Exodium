@@ -23,29 +23,31 @@ public abstract class WeaponBase : NetworkBehaviour
     [SerializeField] public Tanc AttachedTanc;
     public NetworkVariable<ulong> AttachedTancNetObjID { get; set; } = new NetworkVariable<ulong>();
 
-    private bool isDetached = false;
-    //private NetworkVariable<bool> isDetached = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    //!!!! THIS IS NOT NETWORKED BECAUSE IT USES A CUSTOM SETTER
-    // IF YOU NEED TO CONVERT TO NETWORK VARIABLE, REPLACE THE CUSTOM SETTER WITH NetworkVariable.OnValueChanged!!!!
+    //private bool isDetached = false;
+    public NetworkVariable<bool> IsDetached { get; private set; } = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    public bool IsDetached {
-        get { return isDetached; }
-        set
-        {
-            // if detaching: reset attached tanc
-            if (value)
-                AttachedTanc = null;
-
-            // you must set the attached tanc before setting IsDetached - ensures that you aren't attaching unexpectedly 
-            else if (AttachedTanc == null)
-                throw new NullReferenceException();
-
-            if (_collider != null) _collider.enabled = value;
-            if (_rigidbody != null) _rigidbody.isKinematic = !value;
-
-            isDetached = value;
-        }
+    public void SetIsDetachedIfOwner(bool val)
+    {
+        if (IsOwner) IsDetached.Value = val;
     }
+    //public bool IsDetached {
+    //    get { return isDetached; }
+    //    set
+    //    {
+    //        // if detaching: reset attached tanc
+    //        if (value)
+    //            AttachedTanc = null;
+
+    //        //// you must set the attached tanc before setting IsDetached - ensures that you aren't attaching unexpectedly 
+    //        //else if (AttachedTanc == null)
+    //        //    throw new NullReferenceException();
+
+    //        if (_collider != null) _collider.enabled = value;
+    //        if (_rigidbody != null) _rigidbody.isKinematic = !value;
+
+    //        isDetached = value;
+    //    }
+    //}
 
     public bool StartAsDetached = false;
 
@@ -57,10 +59,10 @@ public abstract class WeaponBase : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
-        if (StartAsDetached)
-            IsDetached = true;
-
         AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
+        IsDetached.OnValueChanged += OnIsDetachedChanged;
+
+        SetIsDetachedIfOwner(StartAsDetached);
     }
 
 
@@ -84,6 +86,15 @@ public abstract class WeaponBase : NetworkBehaviour
 
     void FixedUpdate() => OnFixedUpdate();
     protected virtual void OnFixedUpdate() { }
+
+    private void OnIsDetachedChanged(bool prev,  bool curr)
+    {
+        // if detaching: reset attached tanc
+        if (curr) AttachedTanc = null;
+
+        if (_collider != null) _collider.enabled = curr;
+        if (_rigidbody != null) _rigidbody.isKinematic = !curr;
+    }
 
 
     public abstract void Shoot();

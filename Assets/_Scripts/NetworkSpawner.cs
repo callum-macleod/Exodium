@@ -40,6 +40,6 @@ public class NetworkSpawner : NetworkBehaviour
         netObjRef.TryGet(out NetworkObject networkObj);
 
         networkObj.transform.position = position;
-        networkObj.GetComponent<WeaponBase>().IsDetached = true;
+        networkObj.GetComponent<WeaponBase>().SetIsDetachedIfOwner(true);
     }
 }

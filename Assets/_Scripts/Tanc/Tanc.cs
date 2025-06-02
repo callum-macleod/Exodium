@@ -46,10 +46,10 @@ public class Tanc : NetworkBehaviour
         rigidBody = GetComponent<Rigidbody>();
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
         PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
-        EquipWeapon(WeaponSlot.Melee);
+        EquipWeaponRpc(WeaponSlot.Melee);
     }
 
 
@@ -63,11 +63,11 @@ public class Tanc : NetworkBehaviour
 
         // equip weapons
         if (Input.GetKeyDown(KeyCode.Alpha1))
-            EquipWeapon(WeaponSlot.Primary);
+            EquipWeaponRpc(WeaponSlot.Primary);
         if (Input.GetKeyDown(KeyCode.Alpha2))
-            EquipWeapon(WeaponSlot.Secondary);
+            EquipWeaponRpc(WeaponSlot.Secondary);
         if (Input.GetKeyDown(KeyCode.Alpha3))
-            EquipWeapon(WeaponSlot.Melee);
+            EquipWeaponRpc(WeaponSlot.Melee);
 
         // drop weapon
         if (Input.GetKeyDown(KeyCode.G))
@@ -143,8 +143,8 @@ public class Tanc : NetworkBehaviour
             rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
     }
 
-
-    public void EquipWeapon(WeaponSlot slot)
+    [Rpc(SendTo.Everyone)]
+    public void EquipWeaponRpc(WeaponSlot slot)
     {
         // if no weapon in that slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
@@ -186,7 +186,7 @@ public class Tanc : NetworkBehaviour
         weapons[slot].GetComponent<Collider>().enabled = false;
 
         weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-        weapons[slot].GetComponent<WeaponBase>().IsDetached = false;
+        weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
         weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
         weapons[slot].SetActive(false);
         weapons[slot].transform.localPosition = Vector3.zero;
@@ -204,7 +204,7 @@ public class Tanc : NetworkBehaviour
 
         droppedWeapon.transform.parent = null;
         droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
-        droppedWeapon.GetComponent<WeaponBase>().IsDetached = true;
+        droppedWeapon.GetComponent<WeaponBase>().SetIsDetachedIfOwner(true);
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
     }
 

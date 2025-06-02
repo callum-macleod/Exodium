@@ -290,9 +290,6 @@ MonoBehaviour:
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
   weaponSpace: {fileID: 3899069240831065462}
-  slot1: {fileID: 9089276834978807815}
-  slot2: {fileID: 3194170722481189356}
-  slot3: {fileID: 736565039827197057}
   testingprimaryweapon: {fileID: 6410100500443113811, guid: fb0177b50c1edf9499a7ee4ae31d5573, type: 3}
   testingsecondaryweapon: {fileID: 1535780860326277949, guid: 4ff3b47b1200f9f4b86dbf2152154dc4, type: 3}
   hands: {fileID: 7265506205423455575, guid: b6662ca2ffa1abe42a0536fb65f53c26, type: 3}
@@ -384,6 +381,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4365428620273654661}
   - component: {fileID: 8850246926812735723}
+  - component: {fileID: 3878097049185132404}
   m_Layer: 0
   m_Name: HorizontalRotator
   m_TagString: Untagged
@@ -421,6 +419,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalRotator: {fileID: 4587819814955486716}
+--- !u!114 &3878097049185132404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5293195895931659638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00beb0aac2974af41b834cd506bd5c1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &8257125044094295239
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,7 +501,7 @@ MonoBehaviour:
   SyncPositionY: 1
   SyncPositionZ: 1
   SyncRotAngleX: 1
-  SyncRotAngleY: 1
+  SyncRotAngleY: 0
   SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
