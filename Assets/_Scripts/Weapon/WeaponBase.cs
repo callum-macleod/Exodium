@@ -49,18 +49,6 @@ public abstract class WeaponBase : NetworkBehaviour
 
     public bool StartAsDetached = false;
 
-    //void Start() => OnStart();
-    //protected virtual void OnStart()
-    //{
-    //    _rigidbody = GetComponent<Rigidbody>();
-    //    _collider = GetComponent<Collider>();
-
-    //    if (StartAsDetached)
-    //        IsDetached = true;
-
-    //    AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
-    //}
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();

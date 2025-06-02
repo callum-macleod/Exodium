@@ -22,7 +22,24 @@ public class NetworkSpawner : NetworkBehaviour
     public void Test(object sender, HostStartedEventArgs e)
     {
         Debug.LogWarning("spawning shit");
-        NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[2], OwnerClientId).gameObject.transform.position += Vector3.up;
-        NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[1], OwnerClientId).gameObject.transform.position += Vector3.up;
+        SpawnC2SRpc(Weapons.TRifle, (Vector3.left + Vector3.up) * 2);
+        SpawnC2SRpc(Weapons.Spud, (Vector3.right + Vector3.up) * 2);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SpawnC2SRpc(Weapons lookupID, Vector3 position)
+    {
+        NetworkObject trifleNetObj = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[lookupID], OwnerClientId).GetComponent<NetworkObject>();
+
+        SpawnS2CRpc(new NetworkObjectReference(trifleNetObj), position);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SpawnS2CRpc(NetworkObjectReference netObjRef, Vector3 position)
+    {
+        netObjRef.TryGet(out NetworkObject networkObj);
+
+        networkObj.transform.position = position;
+        networkObj.GetComponent<WeaponBase>().IsDetached = true;
     }
 }

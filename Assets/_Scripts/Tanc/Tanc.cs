@@ -86,6 +86,7 @@ public class Tanc : NetworkBehaviour
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
+                    print(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID);
                     PickupWeaponRpc(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
                 }
             }
@@ -163,10 +164,7 @@ public class Tanc : NetworkBehaviour
     {        
         Debug.Log("PickupWeaponC2SRpc");
 
-        // drop weapon in the desired slot
-        DropWeapon(slot);
-
-        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[(int)weapon], OwnerClientId).gameObject;
+        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).gameObject;
         weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
     }
 
@@ -178,6 +176,10 @@ public class Tanc : NetworkBehaviour
     /// <param name="slot"></param>
     public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
     {
+        // drop weapon in the desired slot
+        DropWeapon(slot);
+
+        // attach new weapon
         weapons[slot] = weapon;
         weapons[slot].transform.position += Vector3.up * 3f;
         weapons[slot].GetComponent<Rigidbody>().isKinematic = true;

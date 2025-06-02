@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponID: 1
   AttachedTanc: {fileID: 0}
-  StartAsDetached: 1
+  StartAsDetached: 0
 --- !u!136 &800047694946371143
 CapsuleCollider:
   m_ObjectHideFlags: 0

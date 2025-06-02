@@ -7,5 +7,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WeaponLookup", menuName = "ScriptableObjects/WeaponLookup", order = 1)]
 public class WeaponLookupSO : ScriptableObject
 {
-    [SerializeField] public SerializedDictionary<int, NetworkObject> Dict;
+    [SerializeField] public SerializedDictionary<Weapons, NetworkObject> Dict;
 }
