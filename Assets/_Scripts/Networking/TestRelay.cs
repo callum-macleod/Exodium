@@ -67,7 +67,6 @@ public class TestRelay : MonoBehaviour
         {
             Debug.Log(e);
         }
-
     }
 
     public async void JoinRelay()

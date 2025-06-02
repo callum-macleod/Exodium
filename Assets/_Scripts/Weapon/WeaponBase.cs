@@ -44,20 +44,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
     private void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
-        // find attached tank using associated network object id
-        //foreach (Tanc tanc in FindObjectsOfType(typeof(Tanc)))
-        //{
-        //    if (tanc.GetComponent<NetworkObject>().NetworkObjectId == AttachedTancNetObjRef.Value)
-        //    {
-        //        AttachedTanc = tanc;
-        //        break;
-        //    }
-        //}
-
         curr.TryGet(out NetworkObject t);
         AttachedTanc = t.GetComponent<Tanc>();
-
-        //print($"Attaching {weaponID} to NetObjID => {AttachedTanc.NetworkObjectId}");
 
         AttachedTanc.Attach(gameObject, weaponID, WeaponSlot);
     }

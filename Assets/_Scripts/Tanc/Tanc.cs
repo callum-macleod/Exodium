@@ -175,12 +175,6 @@ public class Tanc : NetworkBehaviour
     }
 
 
-    public void PickupWeaponLocal()
-    {
-
-    }
-
-
     [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
     {        
@@ -209,15 +203,6 @@ public class Tanc : NetworkBehaviour
         weapons[slot] = weapon;
         weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
         weapons[slot].SetActive(false);
-
-        // redundant garbagio
-        //weapons[slot].transform.position += Vector3.up * 3f;
-        //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-        //weapons[slot].GetComponent<Collider>().enabled = false;
-
-        //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
-        //weapons[slot].transform.localPosition = Vector3.zero;
-        //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
     [Rpc(SendTo.Everyone)]
@@ -239,10 +224,6 @@ public class Tanc : NetworkBehaviour
 
         droppedWeapon.GetComponent<WeaponBase>().SetIsDetachedIfOwner(true);
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
-
-        // redundant garbaio
-        //droppedWeapon.transform.parent = null;
-        //droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
     }
 
 
@@ -255,7 +236,6 @@ public class Tanc : NetworkBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-
         if (collision.gameObject.layer == (int)Layers.SolidGround)
             inAir = true;
     }

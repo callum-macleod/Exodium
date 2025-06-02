@@ -22,8 +22,6 @@ public class TRifle : WeaponBase
 
     public override void Shoot()
     {
-        print($"{name}: Shooting");
-
         if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
