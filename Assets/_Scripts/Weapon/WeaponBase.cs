@@ -34,13 +34,13 @@ public abstract class WeaponBase : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        _rigidbody = GetComponent<Rigidbody>();
+        _collider = GetComponent<Collider>();
+
         if (!IsOwner) return;
 
         AttachedTancNetObjRef.OnValueChanged += OnAttachedTancNetObjIDChanged;
         IsDetached.OnValueChanged += OnIsDetachedChanged;
-
-        _rigidbody = GetComponent<Rigidbody>();
-        _collider = GetComponent<Collider>();
     }
 
 
