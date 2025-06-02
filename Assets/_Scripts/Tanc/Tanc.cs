@@ -51,8 +51,6 @@ public class Tanc : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
-        EquipWeaponRpc(WeaponSlot.Melee);
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
     }
 
@@ -159,8 +157,6 @@ public class Tanc : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EquipWeaponRpc(WeaponSlot slot)
     {
-        print($"{{ERPC}} NOID: {NetworkObjectId} => equipping {slot}");
-
         // if no weapon in that slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
@@ -172,14 +168,14 @@ public class Tanc : NetworkBehaviour
         // equip new weapon
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
+
+        print($"{{ERPC}} NOID: {NetworkObjectId} => equipping {slot}");
     }
 
 
     [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
-    {        
-        Debug.Log("PickupWeaponC2SRpc");
-
+    {   
         print($"{{SRPC}} NOID: {NetworkObjectId} => picking up {weapon}");
 
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();

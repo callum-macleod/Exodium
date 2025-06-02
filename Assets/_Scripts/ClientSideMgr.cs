@@ -9,20 +9,20 @@ public class ClientSideMgr : MonoBehaviour
 {
     public static ClientSideMgr Instance;
 
-    public NetworkObject clientOwnedTanc { get; private set; }
+    public NetworkObject ClientOwnedTanc { get; private set; }
 
-    [SerializeField] GameObject shop;
-    [NonSerialized] public bool shopActive = false;
+    [SerializeField] public GameObject Shop;
+    [NonSerialized] public bool ShopActive = false;
 
 
     [SerializeField] GameObject myMenu;
-    [NonSerialized] public bool myMenuActive = false;
+    [NonSerialized] public bool MyMenuActive = false;
 
     public bool IsMenuActive
     {
         get
         {
-            return (shopActive || myMenuActive);
+            return (ShopActive || MyMenuActive);
         }
     }
 
@@ -37,14 +37,14 @@ public class ClientSideMgr : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
-            shopActive = !shopActive;
-            shop.SetActive(shopActive);
+            ShopActive = !ShopActive;
+            Shop.SetActive(ShopActive);
             UpdateCursorLock();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            myMenuActive = !myMenuActive;
-            myMenu.SetActive(myMenuActive);
+            MyMenuActive = !MyMenuActive;
+            myMenu.SetActive(MyMenuActive);
             UpdateCursorLock();
         }
     }
@@ -59,6 +59,6 @@ public class ClientSideMgr : MonoBehaviour
 
     public void SetClientOwnedTanc(NetworkObject tanc)
     {
-        clientOwnedTanc = tanc;
+        ClientOwnedTanc = tanc;
     }
 }

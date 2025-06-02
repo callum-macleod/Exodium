@@ -19,15 +19,9 @@ public class Shop : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void BuyWeapon(Weapons weapon)
     {
         WeaponSlot slot = weaponLookup.Dict[weapon].GetComponent<WeaponBase>().WeaponSlot;
-        ClientSideMgr.Instance.clientOwnedTanc.GetComponent<Tanc>().PickupWeaponRpc(weapon, slot);
+        ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>().PickupWeaponRpc(weapon, slot);
     }
 }
