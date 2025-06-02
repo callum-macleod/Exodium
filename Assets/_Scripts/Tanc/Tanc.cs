@@ -171,6 +171,13 @@ public class Tanc : NetworkBehaviour
         weapons[equippedWeaponSlot].SetActive(true);
     }
 
+
+    public void PickupWeaponLocal()
+    {
+
+    }
+
+
     [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
     {        
@@ -189,7 +196,7 @@ public class Tanc : NetworkBehaviour
     public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
     {
         // drop weapon in the desired slot
-        DropWeaponRpc(slot);
+        DropWeapon(slot);
 
         // attach new weapon
         weapons[slot] = weapon;
@@ -209,6 +216,11 @@ public class Tanc : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void DropWeaponRpc(WeaponSlot slot)
     {
+        DropWeapon(slot);
+    }
+
+    public void DropWeapon(WeaponSlot slot)
+    {
         // if no weapon in slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
@@ -223,6 +235,7 @@ public class Tanc : NetworkBehaviour
         //droppedWeapon.transform.parent = null;
         //droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
     }
+
 
 
     private void OnCollisionEnter(Collision collision)

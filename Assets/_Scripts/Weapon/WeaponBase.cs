@@ -37,8 +37,6 @@ public abstract class WeaponBase : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
-        //if (!IsOwner) return;
-
         AttachedTancNetObjRef.OnValueChanged += OnAttachedTancNetObjIDChanged;
         IsDetached.OnValueChanged += OnIsDetachedChanged;
     }
