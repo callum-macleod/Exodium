@@ -9,7 +9,7 @@ public class ClientSideMgr : MonoBehaviour
 {
     public static ClientSideMgr Instance;
 
-    NetworkObject clientOwnedTanc;
+    public NetworkObject clientOwnedTanc { get; private set; }
 
     [SerializeField] GameObject shop;
     [NonSerialized] public bool shopActive = false;

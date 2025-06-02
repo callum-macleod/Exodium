@@ -446,6 +446,7 @@ GameObject:
   - component: {fileID: 200936098}
   - component: {fileID: 200936097}
   - component: {fileID: 200936096}
+  - component: {fileID: 200936099}
   m_Layer: 5
   m_Name: Spud
   m_TagString: Untagged
@@ -516,7 +517,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 200936097}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 295019250}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &200936097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -555,6 +568,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 200936094}
   m_CullTransparentMesh: 1
+--- !u!114 &200936099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200936094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8708ea00c691684e90373c271ee4e5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapon: 1
 --- !u!1 &214118302
 GameObject:
   m_ObjectHideFlags: 0
@@ -827,13 +853,14 @@ GameObject:
   - component: {fileID: 295019251}
   - component: {fileID: 295019253}
   - component: {fileID: 295019252}
+  - component: {fileID: 295019254}
   m_Layer: 5
   m_Name: Shop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &295019251
 RectTransform:
   m_ObjectHideFlags: 0
@@ -893,6 +920,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 295019250}
   m_CullTransparentMesh: 1
+--- !u!114 &295019254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295019250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d46b737943dab141a5bf6939b2d03a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
+  weaponBtnList:
+  - {fileID: 1833953551}
+  - {fileID: 200936099}
 --- !u!1 &321720520
 GameObject:
   m_ObjectHideFlags: 0
@@ -4564,6 +4607,7 @@ GameObject:
   - component: {fileID: 1833953550}
   - component: {fileID: 1833953549}
   - component: {fileID: 1833953548}
+  - component: {fileID: 1833953551}
   m_Layer: 5
   m_Name: TRifle
   m_TagString: Untagged
@@ -4634,7 +4678,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1833953549}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 295019250}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1833953549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4673,6 +4729,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1833953546}
   m_CullTransparentMesh: 1
+--- !u!114 &1833953551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1833953546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8708ea00c691684e90373c271ee4e5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapon: 2
 --- !u!1 &1899052570
 GameObject:
   m_ObjectHideFlags: 0
