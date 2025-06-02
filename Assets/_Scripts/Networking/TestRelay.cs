@@ -57,8 +57,6 @@ public class TestRelay : MonoBehaviour
 
             lobbyCodeDisplay.text = joincode;
 
-
-            HostStarted += NetworkSpawner.Instance.Test;
             HostStarted?.Invoke(this, new HostStartedEventArgs("kal", joincode));
         }
         catch (RelayServiceException e)
