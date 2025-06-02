@@ -50,6 +50,7 @@ public class Tanc : NetworkBehaviour
     {
         PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
         EquipWeaponRpc(WeaponSlot.Melee);
+        ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
     }
 
 

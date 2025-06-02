@@ -11,7 +11,7 @@ public class Rotator : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || ClientSideMgr.Instance.IsMenuActive) return;
 
         float xRot = Input.GetAxisRaw("Mouse Y");
         float yRot = Input.GetAxisRaw("Mouse X");
