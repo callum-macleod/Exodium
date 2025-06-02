@@ -48,6 +48,8 @@ public class Tanc : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (!IsOwner) return;
+
         PickupWeaponRpc((int)Weapons.Hands, WeaponSlot.Melee);
         EquipWeaponRpc(WeaponSlot.Melee);
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
@@ -156,6 +158,8 @@ public class Tanc : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EquipWeaponRpc(WeaponSlot slot)
     {
+        print(weapons[slot]);
+
         // if no weapon in that slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
@@ -175,7 +179,7 @@ public class Tanc : NetworkBehaviour
         Debug.Log("PickupWeaponC2SRpc");
 
         weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).gameObject;
-        weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjID.Value = NetworkObjectId;
+        weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
     }
 
     /// <summary>
@@ -197,7 +201,6 @@ public class Tanc : NetworkBehaviour
 
         weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
         weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
-        weapons[slot].GetComponent<WeaponBase>().StartAsDetached = false;
         weapons[slot].SetActive(false);
         weapons[slot].transform.localPosition = Vector3.zero;
         weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);

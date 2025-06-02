@@ -21,7 +21,7 @@ public abstract class WeaponBase : NetworkBehaviour
 
 
     [SerializeField] public Tanc AttachedTanc;
-    public NetworkVariable<ulong> AttachedTancNetObjID { get; set; } = new NetworkVariable<ulong>();
+    public NetworkVariable<NetworkObjectReference> AttachedTancNetObjRef { get; set; } = new NetworkVariable<NetworkObjectReference>();
 
     //private bool isDetached = false;
     public NetworkVariable<bool> IsDetached { get; private set; } = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -30,55 +30,36 @@ public abstract class WeaponBase : NetworkBehaviour
     {
         if (IsOwner) IsDetached.Value = val;
     }
-    //public bool IsDetached {
-    //    get { return isDetached; }
-    //    set
-    //    {
-    //        // if detaching: reset attached tanc
-    //        if (value)
-    //            AttachedTanc = null;
 
-    //        //// you must set the attached tanc before setting IsDetached - ensures that you aren't attaching unexpectedly 
-    //        //else if (AttachedTanc == null)
-    //        //    throw new NullReferenceException();
-
-    //        if (_collider != null) _collider.enabled = value;
-    //        if (_rigidbody != null) _rigidbody.isKinematic = !value;
-
-    //        isDetached = value;
-    //    }
-    //}
-
-    public bool StartAsDetached = false;
 
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn();
+        if (!IsOwner) return;
 
+        AttachedTancNetObjRef.OnValueChanged += OnAttachedTancNetObjIDChanged;
+        IsDetached.OnValueChanged += OnIsDetachedChanged;
 
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
-
-        AttachedTancNetObjID.OnValueChanged += OnAttachedTancNetObjIDChanged;
-        IsDetached.OnValueChanged += OnIsDetachedChanged;
-
-        SetIsDetachedIfOwner(StartAsDetached);
     }
 
 
-    private void OnAttachedTancNetObjIDChanged(ulong prev, ulong curr)
+    private void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
         // find attached tank using associated network object id
-        foreach (Tanc tanc in FindObjectsOfType(typeof(Tanc)))
-        {
-            if (tanc.GetComponent<NetworkObject>().NetworkObjectId == AttachedTancNetObjID.Value)
-            {
-                AttachedTanc = tanc;
-                break;
-            }
-        }
+        //foreach (Tanc tanc in FindObjectsOfType(typeof(Tanc)))
+        //{
+        //    if (tanc.GetComponent<NetworkObject>().NetworkObjectId == AttachedTancNetObjRef.Value)
+        //    {
+        //        AttachedTanc = tanc;
+        //        break;
+        //    }
+        //}
 
-        AttachedTanc?.Attach(gameObject, (int)weaponID, WeaponSlot);
+        curr.TryGet(out NetworkObject t);
+        AttachedTanc = t.GetComponent<Tanc>();
+
+        AttachedTanc.Attach(gameObject, (int)weaponID, WeaponSlot);
     }
 
     void Update() => OnUpdate();
