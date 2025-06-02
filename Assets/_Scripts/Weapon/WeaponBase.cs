@@ -59,9 +59,9 @@ public abstract class WeaponBase : NetworkBehaviour
         curr.TryGet(out NetworkObject t);
         AttachedTanc = t.GetComponent<Tanc>();
 
-        print($"Attaching {weaponID} to NetObjID => {AttachedTanc.NetworkObjectId}");
+        //print($"Attaching {weaponID} to NetObjID => {AttachedTanc.NetworkObjectId}");
 
-        AttachedTanc.Attach(gameObject, (int)weaponID, WeaponSlot);
+        AttachedTanc.Attach(gameObject, weaponID, WeaponSlot);
     }
 
     void Update() => OnUpdate();

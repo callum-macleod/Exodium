@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 public class Tanc : NetworkBehaviour
 {
@@ -158,6 +159,8 @@ public class Tanc : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EquipWeaponRpc(WeaponSlot slot)
     {
+        print($"{{ERPC}} NOID: {NetworkObjectId} => equipping {slot}");
+
         // if no weapon in that slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
@@ -176,6 +179,8 @@ public class Tanc : NetworkBehaviour
     {        
         Debug.Log("PickupWeaponC2SRpc");
 
+        print($"{{SRPC}} NOID: {NetworkObjectId} => picking up {weapon}");
+
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
         wb.AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
     }
@@ -186,8 +191,10 @@ public class Tanc : NetworkBehaviour
     /// <param name="weapon"></param>
     /// <param name="weaponID"></param>
     /// <param name="slot"></param>
-    public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
+    public void Attach(GameObject weapon, Weapons weaponID, WeaponSlot slot)
     {
+
+        print($"{{LOCAL}} NOID: {NetworkObjectId} => attaching {weapon}");
         // drop weapon in the desired slot
         DropWeaponRpc(slot);
 
@@ -212,6 +219,8 @@ public class Tanc : NetworkBehaviour
         // if no weapon in slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
+
+        print($"{{ERPC}} NOID: {NetworkObjectId} => dropping {slot}");
 
         GameObject droppedWeapon = weapons[slot];
         weapons.Remove(slot);
