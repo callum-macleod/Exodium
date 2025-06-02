@@ -88,8 +88,10 @@ public class Tanc : NetworkBehaviour
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
-                    print(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID);
-                    PickupWeaponRpc(hit.collider.gameObject.GetComponent<WeaponBase>().weaponID, hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot);
+                    PickupWeaponRpc(
+                        hit.collider.gameObject.GetComponent<WeaponBase>().weaponID,
+                        hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot,
+                        hit.collider.GetComponent<NetworkObject>());
                 }
             }
         }
@@ -174,8 +176,29 @@ public class Tanc : NetworkBehaviour
 
 
     [Rpc(SendTo.Server)]
+    public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot, NetworkObjectReference weaponToDespawn)
+    {
+        print($"{{SRPC}} NOID: {NetworkObjectId} => despawning {weapon}");
+
+        // despawn old weapon
+        weaponToDespawn.TryGet(out NetworkObject _weaponToDespawn);
+        _weaponToDespawn.Despawn();
+
+        PickupWeapon(weapon, slot);
+    }
+
+    [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot)
-    {   
+    {
+        PickupWeapon(weapon, slot);
+    }
+
+    private void PickupWeapon(Weapons weapon, WeaponSlot slot)
+    {
+        if (!IsServer)
+            throw new Exception($"{nameof(PickupWeapon)}() method invoked from NotServer. Should only be called by Server RPC '{nameof(PickupWeaponRpc)}");
+
+
         print($"{{SRPC}} NOID: {NetworkObjectId} => picking up {weapon}");
 
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
