@@ -158,8 +158,6 @@ public class Tanc : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void EquipWeaponRpc(WeaponSlot slot)
     {
-        print(weapons[slot]);
-
         // if no weapon in that slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
