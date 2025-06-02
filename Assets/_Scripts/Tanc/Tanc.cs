@@ -176,8 +176,8 @@ public class Tanc : NetworkBehaviour
     {        
         Debug.Log("PickupWeaponC2SRpc");
 
-        weapons[slot] = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).gameObject;
-        weapons[slot].GetComponent<WeaponBase>().AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
+        WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
+        wb.AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
     }
 
     /// <summary>
@@ -193,15 +193,17 @@ public class Tanc : NetworkBehaviour
 
         // attach new weapon
         weapons[slot] = weapon;
-        weapons[slot].transform.position += Vector3.up * 3f;
-        weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
-        weapons[slot].GetComponent<Collider>().enabled = false;
-
-        weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
         weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
         weapons[slot].SetActive(false);
-        weapons[slot].transform.localPosition = Vector3.zero;
-        weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
+
+        // redundant garbagio
+        //weapons[slot].transform.position += Vector3.up * 3f;
+        //weapons[slot].GetComponent<Rigidbody>().isKinematic = true;
+        //weapons[slot].GetComponent<Collider>().enabled = false;
+
+        //weapons[slot].GetComponent<WeaponBase>().AttachedTanc = this;
+        //weapons[slot].transform.localPosition = Vector3.zero;
+        //weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
     [Rpc(SendTo.Everyone)]
@@ -214,10 +216,12 @@ public class Tanc : NetworkBehaviour
         GameObject droppedWeapon = weapons[slot];
         weapons.Remove(slot);
 
-        droppedWeapon.transform.parent = null;
-        droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
         droppedWeapon.GetComponent<WeaponBase>().SetIsDetachedIfOwner(true);
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
+
+        // redundant garbaio
+        //droppedWeapon.transform.parent = null;
+        //droppedWeapon.GetComponent<WeaponBase>().AttachedTanc = null;
     }
 
 

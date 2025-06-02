@@ -37,7 +37,7 @@ public abstract class WeaponBase : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
-        if (!IsOwner) return;
+        //if (!IsOwner) return;
 
         AttachedTancNetObjRef.OnValueChanged += OnAttachedTancNetObjIDChanged;
         IsDetached.OnValueChanged += OnIsDetachedChanged;
@@ -58,6 +58,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
         curr.TryGet(out NetworkObject t);
         AttachedTanc = t.GetComponent<Tanc>();
+
+        print($"Attaching {weaponID} to NetObjID => {AttachedTanc.NetworkObjectId}");
 
         AttachedTanc.Attach(gameObject, (int)weaponID, WeaponSlot);
     }
