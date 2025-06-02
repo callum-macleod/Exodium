@@ -56,6 +56,10 @@ public class TestRelay : MonoBehaviour
             NetworkManager.Singleton.StartHost();
 
             lobbyCodeDisplay.text = joincode;
+            TextEditor te = new TextEditor();
+            te.text = joincode;
+            te.SelectAll();
+            te.Copy();
 
             HostStarted?.Invoke(this, new HostStartedEventArgs("kal", joincode));
         }

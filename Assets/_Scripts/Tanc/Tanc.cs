@@ -72,7 +72,7 @@ public class Tanc : NetworkBehaviour
 
         // drop weapon
         if (Input.GetKeyDown(KeyCode.G))
-            DropWeapon(equippedWeaponSlot);
+            DropWeaponRpc(equippedWeaponSlot);
 
         // throw nade
         if (Input.GetKeyDown(KeyCode.E))
@@ -141,7 +141,16 @@ public class Tanc : NetworkBehaviour
 
         // decelleration (if not inputting movement)
         if (Move.magnitude < 0.1f)
-            rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
+        {
+            if (nonVerticalVelocity.magnitude < 0.1f)
+            {
+                rigidBody.velocity = new Vector3(0, rigidBody.velocity.y, 0);
+            }
+            else
+            {
+                rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
+            }
+        }
     }
 
     [Rpc(SendTo.Everyone)]
@@ -178,7 +187,7 @@ public class Tanc : NetworkBehaviour
     public void Attach(GameObject weapon, int weaponID, WeaponSlot slot)
     {
         // drop weapon in the desired slot
-        DropWeapon(slot);
+        DropWeaponRpc(slot);
 
         // attach new weapon
         weapons[slot] = weapon;
@@ -194,7 +203,8 @@ public class Tanc : NetworkBehaviour
         weapons[slot].transform.localRotation = Quaternion.Euler(Vector3.zero);
     }
 
-    public void DropWeapon(WeaponSlot slot)
+    [Rpc(SendTo.Everyone)]
+    public void DropWeaponRpc(WeaponSlot slot)
     {
         // if no weapon in slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
