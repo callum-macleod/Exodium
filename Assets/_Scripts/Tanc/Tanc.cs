@@ -95,6 +95,9 @@ public class Tanc : NetworkBehaviour
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+            transform.position += Vector3.up * 5;
     }
 
     private void FixedUpdate()
@@ -122,9 +125,9 @@ public class Tanc : NetworkBehaviour
     }
 
 
+    // redistribute velocity
     void CalculateMovement()
     {
-        // redistribute velocity
         Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
 
         // if the user is trying to move and current velocity > maximum velocity:
@@ -138,12 +141,16 @@ public class Tanc : NetworkBehaviour
             rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
         }
 
-        // apply new movement input
-        rigidBody.AddForce(Move);
+        float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
+        // apply new movement input
+        if (inAir && dot > 0)
+            rigidBody.AddForce(Move * (1 - dot)/5);
+        else
+            rigidBody.AddForce(Move);
 
         // decelleration (if not inputting movement)
-        if (Move.magnitude < 0.1f)
+        if (Move.magnitude < 0.1f && !inAir)
         {
             if (nonVerticalVelocity.magnitude < 0.1f)
             {
