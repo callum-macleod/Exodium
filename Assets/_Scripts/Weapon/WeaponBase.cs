@@ -13,6 +13,7 @@ public abstract class WeaponBase : NetworkBehaviour
     protected abstract float critMultiplier { get; set; }
     protected abstract float limbMultiplier { get; set; }
     public abstract WeaponSlot WeaponSlot { get; }
+    public abstract float MaxVelocity { get; }
 
 
     // behaviour while detached from a tanc (i.e. on the floor)
@@ -23,7 +24,6 @@ public abstract class WeaponBase : NetworkBehaviour
     [SerializeField] public Tanc AttachedTanc;
     public NetworkVariable<NetworkObjectReference> AttachedTancNetObjRef { get; set; } = new NetworkVariable<NetworkObjectReference>();
 
-    //private bool isDetached = false;
     public NetworkVariable<bool> IsDetached { get; private set; } = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public void SetIsDetachedIfOwner(bool val)

@@ -19,7 +19,7 @@ public class Tanc : NetworkBehaviour
     // states
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 15; // force multiplier to deceleration force
-    int maxVelocity = 8; // when speed exceeds this value, set movespeed to this value isntead.
+    int defaultMaxVelocity = 12; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
     int jumpForce = 6; // force of the jump
     public Vector3 Move { get; private set; }
     bool inAir = true;
@@ -27,10 +27,6 @@ public class Tanc : NetworkBehaviour
     WeaponSlot equippedWeaponSlot;
 
     Dictionary<WeaponSlot, GameObject> weapons = new Dictionary<WeaponSlot, GameObject>();
-
-    public GameObject testingprimaryweapon;
-    public GameObject testingsecondaryweapon;
-    public GameObject hands;
 
     // detecting nearby weapons
     float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
@@ -95,9 +91,6 @@ public class Tanc : NetworkBehaviour
                 }
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
-            transform.position += Vector3.up * 5;
     }
 
     private void FixedUpdate()
@@ -130,9 +123,13 @@ public class Tanc : NetworkBehaviour
     {
         Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
 
+        // get max velocity
+        float maxV = weapons.ContainsKey(equippedWeaponSlot)
+            ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
+            : defaultMaxVelocity;
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
-        if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxVelocity)
+        if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
         {
             float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);

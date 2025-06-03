@@ -97,7 +97,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 103
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -147,8 +147,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1983109514909579982}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.186524, z: 0, w: 0.9824504}
-  m_LocalPosition: {x: 0.93, y: -0.5, z: 0.66}
+  m_LocalRotation: {x: 0, y: 0.03489949, z: 0, w: 0.99939084}
+  m_LocalPosition: {x: 0.65, y: -0.5, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -156,7 +156,7 @@ Transform:
   - {fileID: 8974660650966727049}
   - {fileID: 4591427290271229247}
   m_Father: {fileID: 4587819814955486716}
-  m_LocalEulerAnglesHint: {x: 0, y: 21.5, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 4, z: 0}
 --- !u!1 &2140893562268515772
 GameObject:
   m_ObjectHideFlags: 0
@@ -292,9 +292,6 @@ MonoBehaviour:
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
   weaponSpace: {fileID: 3899069240831065462}
-  testingprimaryweapon: {fileID: 6410100500443113811, guid: fb0177b50c1edf9499a7ee4ae31d5573, type: 3}
-  testingsecondaryweapon: {fileID: 1535780860326277949, guid: 4ff3b47b1200f9f4b86dbf2152154dc4, type: 3}
-  hands: {fileID: 7265506205423455575, guid: b6662ca2ffa1abe42a0536fb65f53c26, type: 3}
   weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
   nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
 --- !u!114 &5121455351405466758
