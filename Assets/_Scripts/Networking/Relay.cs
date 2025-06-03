@@ -10,7 +10,7 @@ using Unity.Netcode.Transports.UTP;
 using System;
 using TMPro;
 
-public class TestRelay : MonoBehaviour
+public class Relay : MonoBehaviour
 {
     public TMP_Text lobbyCodeDisplay;
 
