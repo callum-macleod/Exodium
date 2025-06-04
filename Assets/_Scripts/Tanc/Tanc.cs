@@ -170,7 +170,7 @@ public class Tanc : NetworkBehaviour
 
             print(dot2);
 
-            if (dot2 <= 0.1f && dot2 >= -0.8f)
+            if (dot2 <= 0.3f && dot2 >= -0.8f)
                 rigidBody.velocity = (Move + xzVelocity.normalized).normalized * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
             else
                 rigidBody.AddForce(Move);
