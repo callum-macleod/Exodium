@@ -499,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b83119c4edc8cd44e90b1e8f2ea65deb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 150
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 601292789}
@@ -3231,7 +3231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b83119c4edc8cd44e90b1e8f2ea65deb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 150
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 214118303}
@@ -3599,7 +3599,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b411ae604d25db0479d626f0590d9214, type: 3}
       propertyPath: m_Name
-      value: Tanc
+      value: TancModel
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4416,7 +4416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b83119c4edc8cd44e90b1e8f2ea65deb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 150
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 1823955859}
