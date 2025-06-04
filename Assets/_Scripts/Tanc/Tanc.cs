@@ -22,9 +22,9 @@ public class Tanc : NetworkBehaviour
 
     // states
     float acceleration = 55; // force multiplier to acceleration force
-    float deceleration = 15; // force multiplier to deceleration force
-    int defaultMaxVelocity = 12; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
-    int jumpForce = 6; // force of the jump
+    float deceleration = 25; // force multiplier to deceleration force
+    int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
+    float jumpForce = 7.25f; // force of the jump
     public Vector3 Move { get; private set; }
     bool inAir = true;
 
@@ -113,9 +113,11 @@ public class Tanc : NetworkBehaviour
 
         CalculateMovement();
 
-        // if falling, fall with increased (2x) gravity
-        if (rigidBody.velocity.y <= 0)
-            rigidBody.AddForce(Physics.gravity / 2, ForceMode.Acceleration);
+
+        // Add downward force in addition to existing gravity when jumping (more when falling).
+        float x = (rigidBody.velocity.y <= 0) ? 1 : 0.7f;
+        rigidBody.AddForce(Physics.gravity * x, ForceMode.Acceleration);
+
 
         if (weapons.ContainsKey(equippedWeaponSlot))
         {

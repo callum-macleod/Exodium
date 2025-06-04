@@ -6,7 +6,7 @@ public class Hands : WeaponBase
 {
     public override WeaponSlot WeaponSlot { get; } = WeaponSlot.Melee;
 
-    public override float MaxVelocity { get; } = 12;
+    public override float MaxVelocity { get; } = 10;
 
     protected override int baseDamage { get; set; } = 30;
     protected override float critMultiplier { get; set; } = 2f;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TRifle : WeaponBase
 {
-    public override float MaxVelocity { get; } = 8;
+    public override float MaxVelocity { get; } = 7;
     protected override int baseDamage { get; set; } = 44;
     protected override float critMultiplier { get; set; } = 3f;
     protected override float limbMultiplier { get; set; } = 0.8f;
