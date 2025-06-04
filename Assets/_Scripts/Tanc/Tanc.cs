@@ -165,7 +165,7 @@ public class Tanc : NetworkBehaviour
 
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
-        if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
+        if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
         {
             float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
