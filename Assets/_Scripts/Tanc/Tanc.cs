@@ -144,6 +144,7 @@ public class Tanc : NetworkBehaviour
         float maxV = weapons.ContainsKey(equippedWeaponSlot)
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
+
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
@@ -155,19 +156,31 @@ public class Tanc : NetworkBehaviour
             rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
         }
 
-        float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
+        float dot = Vector3.Dot(Move.normalized, (Move.normalized + nonVerticalVelocity.normalized).normalized);
+        //float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
         // apply new movement input
         if (inAir)
         {
-            if (dot > 0)
-            {
-                rigidBody.AddForce(Move * (1 - dot) * 0.8f);
-            }
-            else
-            {
-                rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 3);
-            }
+            //float dotAbs = Mathf.Abs(dot);
+            //Vector3 someNewVector = rigidBody.velocity
+            //rigidBody.velocity = 
+
+            //if (dot > 0)
+            //{
+            //    print(nonVerticalVelocity.magnitude);
+            //    //rigidBody.AddForce(Move * (1 - dot) * 0.3f);
+            //    //rigidBody.AddForce(Move * (1 - dot) * 0.8f + Move * (1 - dot) * nonVerticalVelocity.magnitude * 0.025f);
+            //}
+            //else
+            //{
+            //    rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 3);
+            //}
+            float inverseAbsDot = 1 - Mathf.Abs(dot);
+            rigidBody.AddForce(
+                inverseAbsDot * 0.5f * Move
+                + inverseAbsDot * nonVerticalVelocity.magnitude * 0.5f * Move
+                );
         }
         else
         {
