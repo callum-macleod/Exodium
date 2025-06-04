@@ -177,10 +177,16 @@ public class Tanc : NetworkBehaviour
             //    rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 3);
             //}
             float inverseAbsDot = 1 - Mathf.Abs(dot);
+
+
             rigidBody.AddForce(
                 inverseAbsDot * 0.5f * Move
                 + inverseAbsDot * nonVerticalVelocity.magnitude * 0.5f * Move
                 );
+            //rigidBody.AddForce(
+            //    (1 - (MathF.Pow(inverseAbsDot, 2) * 5f)) * Move
+            //    + inverseAbsDot * nonVerticalVelocity.magnitude * 0.5f * Move
+            //    );
         }
         else
         {
