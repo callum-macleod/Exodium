@@ -296,6 +296,9 @@ MonoBehaviour:
   GroundChecker: {fileID: 5456907068024958997}
   weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
   nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
+  testingThreshold: 0.5
+  c: 3
+  m: 1.5
 --- !u!114 &5121455351405466758
 MonoBehaviour:
   m_ObjectHideFlags: 0

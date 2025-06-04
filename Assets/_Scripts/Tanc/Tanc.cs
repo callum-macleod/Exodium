@@ -40,6 +40,10 @@ public class Tanc : NetworkBehaviour
 
     //TEMP
     public NetworkObject nade;
+    public float testingThreshold;
+    private bool S;
+    public float c;
+    public float m;
 
 
     void Awake()
@@ -148,8 +152,16 @@ public class Tanc : NetworkBehaviour
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
+
+        if (Input.GetKey(KeyCode.S))
+            S = true;
+
         // get dot product between current (non vertical) velocity and inputted movement direction
-        float dot = Vector3.Dot(Move.normalized, (Move.normalized + nonVerticalVelocity.normalized).normalized);
+        Vector3 sumOfVelocityAndInput = Move.normalized + nonVerticalVelocity.normalized;
+        float dot = Vector3.Dot(Move.normalized, sumOfVelocityAndInput.normalized);
+        //float dot = Vector3.Dot(Move.normalized, (Move.normalized + nonVerticalVelocity.normalized).normalized);
+
+        float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
@@ -167,14 +179,26 @@ public class Tanc : NetworkBehaviour
         // apply new movement input
         if (inAir)
         {
+            //float inverseAbsDot = 1 - Mathf.Abs(dot2);
             float inverseAbsDot = 1 - Mathf.Abs(dot);
-            if (inverseAbsDot < 0.5)
+
+            //if (true)
+            if (dot2 > -0.4)
+            //if (sumOfVelocityAndInput.magnitude > 0.1)
+            //if (inverseAbsDot < testingThreshold)
             {
                 //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
 
                 //float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, Move, Vector3.up);
                 float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, nonVerticalVelocity + Move, Vector3.up);
-                float redirectionStrength = angleDiff * inverseAbsDot;
+                float abs = Mathf.Abs(dot);
+                float absI = Mathf.Abs(inverseAbsDot);
+                float shit = Mathf.Pow(2, Mathf.Abs(dot));
+                float shitI = Mathf.Pow(2, Mathf.Abs(inverseAbsDot));
+                float redirectionStrength = angleDiff * Mathf.Pow(m, Mathf.Abs(inverseAbsDot) - c);
+                //float redirectionStrength = angleDiff * Mathf.Pow(2, Mathf.Abs(inverseAbsDot) - 1.5f);
+                //float redirectionStrength = angleDiff * inverseAbsDot;
+                print(redirectionStrength);
 
                 Quaternion rot = Quaternion.Euler(0, redirectionStrength, 0); // THIS RIGHT HERE
 
@@ -187,7 +211,7 @@ public class Tanc : NetworkBehaviour
                 //print(inverseAbsDot * Move.magnitude);
             }
 
-            float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
+            //dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
             if (dot2 < -0.25)
                 rigidBody.AddForce(Mathf.Abs(dot2) * Move);
         }
