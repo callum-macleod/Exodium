@@ -40,10 +40,13 @@ public class Tanc : NetworkBehaviour
 
     //TEMP
     public NetworkObject nade;
-    public float testingThreshold;
-    private bool S;
-    public float c;
-    public float m;
+
+    // used for air strafing calculations
+    public float airStrafeThreshold = 0.8f;
+    public float c = 4; // constant value
+    public float m = 2; // exponential value
+
+    public float z = 1f;  // determines how quickly you slow down when exceeding maximum velocity (whilst on the ground)
 
 
     void Awake()
@@ -67,7 +70,7 @@ public class Tanc : NetworkBehaviour
         if (!IsOwner) return;
 
         // jump
-        if (Input.GetKeyDown(KeyCode.Space) && !inAir)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir)
             rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
 
         // equip weapons
@@ -145,6 +148,7 @@ public class Tanc : NetworkBehaviour
     // redistribute velocity
     void CalculateMovement()
     {
+        ///////////////////////////////////// HELPER VARIABLES ///////////////////////////
         Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
 
         // get max velocity
@@ -152,17 +156,14 @@ public class Tanc : NetworkBehaviour
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
-
-        if (Input.GetKey(KeyCode.S))
-            S = true;
-
         // get dot product between current (non vertical) velocity and inputted movement direction
         Vector3 sumOfVelocityAndInput = Move.normalized + nonVerticalVelocity.normalized;
-        float dot = Vector3.Dot(Move.normalized, sumOfVelocityAndInput.normalized);
-        //float dot = Vector3.Dot(Move.normalized, (Move.normalized + nonVerticalVelocity.normalized).normalized);
+        float dotSOVAI = Vector3.Dot(Move.normalized, sumOfVelocityAndInput.normalized);  // dot product of Move and sumOfVelocityAndInput
 
-        float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
+        float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);  // dot product of move and nonVerticalVelocity
 
+
+        ///////////////////////////////////// REDUCE SPEED IF OVER MAXIMUM VELOCITY ///////////////////////////
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
@@ -170,59 +171,43 @@ public class Tanc : NetworkBehaviour
             float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
-            // reduce velocity in current direction
-            rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
+            // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
+            rigidBody.AddForce(
+                nonVerticalVelocity.normalized
+                * (-1 * Move.magnitude * aRadian)
+                * (1 + (nonVerticalVelocity.magnitude - maxV) * z * Time.fixedDeltaTime));
         }
 
-        //float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
-        // apply new movement input
-        if (inAir)
+        ///////////////////////////////////// APPLY NEW MOVEMENT ///////////////////////////
+        
+        if (inAir)  // AIR STRAFING
         {
-            //float inverseAbsDot = 1 - Mathf.Abs(dot2);
-            float inverseAbsDot = 1 - Mathf.Abs(dot);
+            float inverseAbsDotSOVAI = 1 - Mathf.Abs(dotSOVAI);
 
-            //if (true)
-            //if (dot2 > -0.4)
-            //if (sumOfVelocityAndInput.magnitude > 0.1)
-            if (inverseAbsDot < testingThreshold)
+            if (inverseAbsDotSOVAI < airStrafeThreshold)
             {
-                //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
+                float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, nonVerticalVelocity + Move, Vector3.up);  // find the difference in y rotation between nonVV and nonVV + Move
+                float redirectionStrength = Mathf.Pow(m, Mathf.Abs(inverseAbsDotSOVAI) - c);  // y = m^x - C  (exponential curve, plug into desmos for vague idea)
+                float redirection = angleDiff * redirectionStrength;  // multiply both together to find redirection
+                Quaternion rot = Quaternion.Euler(0, redirection, 0); // use this to create quaternion
 
-                //float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, Move, Vector3.up);
-                float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, nonVerticalVelocity + Move, Vector3.up);
-                float abs = Mathf.Abs(dot);
-                float absI = Mathf.Abs(inverseAbsDot);
-                float shit = Mathf.Pow(2, Mathf.Abs(dot));
-                float shitI = Mathf.Pow(2, Mathf.Abs(inverseAbsDot));
-                float redirectionStrength = Mathf.Pow(m, Mathf.Abs(inverseAbsDot) - c);
-                float redirection = angleDiff * redirectionStrength;
-                //float redirectionStrength = angleDiff * Mathf.Pow(2, Mathf.Abs(inverseAbsDot) - 1.5f);
-                //float redirectionStrength = angleDiff * inverseAbsDot;
-                print(redirectionStrength);
-
-                Quaternion rot = Quaternion.Euler(0, redirection, 0); // THIS RIGHT HERE
-
-
-
+                // if movement inputted, redirect the existing velocity with a certain degree of effectiveness (determined by angles and dot products above)
                 if (Move != Vector3.zero)
                     rigidBody.velocity = Vector3.up * rigidBody.velocity.y + rot * nonVerticalVelocity;
-
-                //// movement in the same direction as (or directly opposing) momentum should be added
-                //print(inverseAbsDot * Move.magnitude);
             }
 
-            //dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
+            // allows you to hold S (or whichever button is appropriate at the time) to counteract your momentum
             if (dot2 < -0.25)
                 rigidBody.AddForce(Mathf.Abs(dot2) * Move);
         }
-        else
+        else  // GROUND MOVEMENT
         {
-            //rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 5);
             rigidBody.AddForce(Move);
         }
 
-        // decelleration (if not inputting movement)
+
+        ///////////////////////////////////// DECELLERATION (if not inputting movement) ///////////////////////////
         if (Move.magnitude < 0.1f && !inAir)
         {
             if (nonVerticalVelocity.magnitude < 0.1f)

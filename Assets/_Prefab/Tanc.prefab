@@ -299,6 +299,7 @@ MonoBehaviour:
   testingThreshold: 0.8
   c: 4
   m: 2
+  z: 1
 --- !u!114 &5121455351405466758
 MonoBehaviour:
   m_ObjectHideFlags: 0
