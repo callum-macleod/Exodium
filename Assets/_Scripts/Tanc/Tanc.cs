@@ -158,10 +158,22 @@ public class Tanc : NetworkBehaviour
         float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
         // apply new movement input
-        if (inAir && dot > 0)
-            rigidBody.AddForce(Move * (1 - dot)/5);
+        if (inAir)
+        {
+            if (dot > 0)
+            {
+                rigidBody.AddForce(Move * (1 - dot) * 0.8f);
+            }
+            else
+            {
+                rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 3);
+            }
+        }
         else
+        {
+            //rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 5);
             rigidBody.AddForce(Move);
+        }
 
         // decelleration (if not inputting movement)
         if (Move.magnitude < 0.1f && !inAir)
