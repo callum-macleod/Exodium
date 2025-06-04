@@ -168,21 +168,28 @@ public class Tanc : NetworkBehaviour
         if (inAir)
         {
             float inverseAbsDot = 1 - Mathf.Abs(dot);
-            //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
+            if (inverseAbsDot < 0.5)
+            {
+                //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
 
-            float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, Move, Vector3.up);
-            float redirectionStrength = angleDiff * inverseAbsDot;
+                //float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, Move, Vector3.up);
+                float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, nonVerticalVelocity + Move, Vector3.up);
+                float redirectionStrength = angleDiff * inverseAbsDot;
 
-            Quaternion rot = Quaternion.Euler(0, redirectionStrength, 0); // THIS RIGHT HERE
+                Quaternion rot = Quaternion.Euler(0, redirectionStrength, 0); // THIS RIGHT HERE
 
 
 
-            if (Move != Vector3.zero)
-                rigidBody.velocity = Vector3.up * rigidBody.velocity.y + rot * nonVerticalVelocity;
+                if (Move != Vector3.zero)
+                    rigidBody.velocity = Vector3.up * rigidBody.velocity.y + rot * nonVerticalVelocity;
 
-            // movement in the same direction as (or directly opposing) momentum should be added
-            print(inverseAbsDot * Move.magnitude);
-            rigidBody.AddForce(inverseAbsDot * Move);
+                //// movement in the same direction as (or directly opposing) momentum should be added
+                //print(inverseAbsDot * Move.magnitude);
+            }
+
+            float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
+            if (dot2 < -0.25)
+                rigidBody.AddForce(Mathf.Abs(dot2) * Move);
         }
         else
         {
