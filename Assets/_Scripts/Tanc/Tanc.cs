@@ -183,9 +183,9 @@ public class Tanc : NetworkBehaviour
             float inverseAbsDot = 1 - Mathf.Abs(dot);
 
             //if (true)
-            if (dot2 > -0.4)
+            //if (dot2 > -0.4)
             //if (sumOfVelocityAndInput.magnitude > 0.1)
-            //if (inverseAbsDot < testingThreshold)
+            if (inverseAbsDot < testingThreshold)
             {
                 //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
 
@@ -195,12 +195,13 @@ public class Tanc : NetworkBehaviour
                 float absI = Mathf.Abs(inverseAbsDot);
                 float shit = Mathf.Pow(2, Mathf.Abs(dot));
                 float shitI = Mathf.Pow(2, Mathf.Abs(inverseAbsDot));
-                float redirectionStrength = angleDiff * Mathf.Pow(m, Mathf.Abs(inverseAbsDot) - c);
+                float redirectionStrength = Mathf.Pow(m, Mathf.Abs(inverseAbsDot) - c);
+                float redirection = angleDiff * redirectionStrength;
                 //float redirectionStrength = angleDiff * Mathf.Pow(2, Mathf.Abs(inverseAbsDot) - 1.5f);
                 //float redirectionStrength = angleDiff * inverseAbsDot;
                 print(redirectionStrength);
 
-                Quaternion rot = Quaternion.Euler(0, redirectionStrength, 0); // THIS RIGHT HERE
+                Quaternion rot = Quaternion.Euler(0, redirection, 0); // THIS RIGHT HERE
 
 
 
