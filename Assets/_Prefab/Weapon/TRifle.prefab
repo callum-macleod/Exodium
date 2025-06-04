@@ -158,8 +158,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponID: 2
+  ShootSfx: {fileID: 8236992411107391694, guid: b89a73c21aa7f374da3d348eb120d63a, type: 3}
   AttachedTanc: {fileID: 0}
-  StartAsDetached: 1
 --- !u!136 &8593088133392927745
 CapsuleCollider:
   m_ObjectHideFlags: 0

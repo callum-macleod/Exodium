@@ -20,6 +20,8 @@ public abstract class WeaponBase : NetworkBehaviour
     [SerializeField] Rigidbody _rigidbody { get; set; }
     [SerializeField] Collider _collider { get; set; }
 
+    [SerializeField] protected GameObject ShootSfx;
+
 
     [SerializeField] public Tanc AttachedTanc;
     public NetworkVariable<NetworkObjectReference> AttachedTancNetObjRef { get; set; } = new NetworkVariable<NetworkObjectReference>();
