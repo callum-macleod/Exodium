@@ -16,6 +16,10 @@ public class Tanc : NetworkBehaviour
     [SerializeField] public Transform VerticalRotator;
     [SerializeField] Transform weaponSpace;
 
+    [SerializeField] Transform GroundChecker;
+    float groundCheckRayRadius = 0.3f;
+    float groundCheckRayRange = 0.2f;
+
     // states
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 15; // force multiplier to deceleration force
@@ -48,6 +52,9 @@ public class Tanc : NetworkBehaviour
         if (!IsOwner) return;
 
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
+
+        //// make sure ground checker is slightly higher than the ray radius (otherwise sphere cast doesn't work)
+        //GroundChecker.position = Vector3.up * (groundCheckRayRadius + 0.05f);
     }
 
 
@@ -115,8 +122,16 @@ public class Tanc : NetworkBehaviour
             weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
             weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
         }
+
+        GroundCheck(groundCheckRayRadius, groundCheckRayRange);
     }
 
+    void GroundCheck(float rayRadius, float rayRange)
+    {
+        // start spherecast from slight above groundchecker (if origin is within radius of target, then sphere cast shits itself and dies and does not work)
+        Vector3 origin = GroundChecker.position + Vector3.up * (groundCheckRayRadius + 0.05f);
+        inAir = !Physics.SphereCast(origin, rayRadius, Vector3.down, out RaycastHit hit, rayRange, Utils.LayerToLayerMask(Layers.SolidGround));
+    }
 
     // redistribute velocity
     void CalculateMovement()
@@ -251,17 +266,17 @@ public class Tanc : NetworkBehaviour
 
 
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.layer == (int)Layers.SolidGround)
-            inAir = false;
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.layer == (int)Layers.SolidGround)
+    //        inAir = false;
+    //}
 
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.layer == (int)Layers.SolidGround)
-            inAir = true;
-    }
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (collision.gameObject.layer == (int)Layers.SolidGround)
+    //        inAir = true;
+    //}
 
     [Rpc(SendTo.Server)]
     private void ThrowNadeRpc()
