@@ -112,7 +112,7 @@ public class Tanc : NetworkBehaviour
         float zMov = Input.GetAxisRaw("Vertical");
 
         // get inputted movement relative to the rotator/camera rotation
-        Move = (Utils.RemoveY(HorizontalRotator.forward) * zMov + HorizontalRotator.right * xMov).normalized * acceleration;
+        Move = ((HorizontalRotator.forward) * zMov + HorizontalRotator.right * xMov);
 
         CalculateMovement();
 
@@ -148,47 +148,39 @@ public class Tanc : NetworkBehaviour
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
-        // get dot product between current (non vertical) velocity and inputted movement direction
-        float dot = Vector3.Dot(Move.normalized, (Move.normalized + nonVerticalVelocity.normalized).normalized);
-
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
         {
-            float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
-            float aRadian = Mathf.Abs(A / 180);
+            //float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
+            //float aRadian = Mathf.Abs(A / 180);
 
-            // reduce velocity in current direction
-            rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
+            //// reduce velocity in current direction
+            //rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
+
+            rigidBody.velocity = nonVerticalVelocity.normalized * maxV + new Vector3(0, rigidBody.velocity.y, 0);
         }
-
-        //float dot = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);
 
         // apply new movement input
         if (inAir)
         {
-            float inverseAbsDot = 1 - Mathf.Abs(dot);
-            //float redirectionStrength = (inverseAbsDot * 2 + inverseAbsDot * (nonVerticalVelocity.magnitude - 5) * 0.5f);
+            Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
 
-            float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, Move, Vector3.up);
-            float redirectionStrength = angleDiff * inverseAbsDot;
+            float dot2 = (Vector3.Dot(xzVelocity.normalized, (Move + xzVelocity.normalized).normalized));
 
-            Quaternion rot = Quaternion.Euler(0, redirectionStrength, 0); // THIS RIGHT HERE
+            print(dot2);
 
-
-
-            if (Move != Vector3.zero)
-                rigidBody.velocity = Vector3.up * rigidBody.velocity.y + rot * nonVerticalVelocity;
-
-            // movement in the same direction as (or directly opposing) momentum should be added
-            print(inverseAbsDot * Move.magnitude);
-            rigidBody.AddForce(inverseAbsDot * Move);
+            if (dot2 <= 0.1f && dot2 >= -0.8f)
+                rigidBody.velocity = (Move + xzVelocity.normalized).normalized * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+            else
+                rigidBody.AddForce(Move);
         }
         else
         {
-            //rigidBody.AddForce((1 - Mathf.Abs(dot)) * Move + Move / 5);
-            rigidBody.AddForce(Move);
+            rigidBody.AddForce(Move * acceleration);
         }
+
+        Move *= acceleration;
 
         // decelleration (if not inputting movement)
         if (Move.magnitude < 0.1f && !inAir)
