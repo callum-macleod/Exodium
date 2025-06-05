@@ -42,8 +42,7 @@ public class Tanc : NetworkBehaviour
     public NetworkObject nade;
 
     public float slerpStrength;
-    public bool elseIf;
-    private float TESTINGAirMaxV = 4;
+    private float lowVelocityAirControlThreshold = 4;
 
     void Awake()
     {
@@ -88,8 +87,6 @@ public class Tanc : NetworkBehaviour
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
         {
-            float minDot = weaponPickupAngle;
-
             if (Physics.SphereCast(VerticalRotator.position, 1f, VerticalRotator.forward, out RaycastHit hit, pickupRange, Utils.LayerToLayerMask(Layers.Weapon)))
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
@@ -141,11 +138,22 @@ public class Tanc : NetworkBehaviour
         inAir = !Physics.SphereCast(origin, rayRadius, Vector3.down, out RaycastHit hit, rayRange, Utils.LayerToLayerMask(Layers.SolidGround));
     }
 
+    /// <summary>
+    /// if movement input not forward (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
     bool DotNotForward(float dot)
     {
         return dot <= 0.1f;
     }
 
+
+    /// <summary>
+    /// if movement input not directly backwards (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
     bool DotNotDirectlyBackwards(float dot)
     {
         return dot >= -0.8f;
@@ -154,7 +162,7 @@ public class Tanc : NetworkBehaviour
     // redistribute velocity
     void CalculateMovement()
     {
-        Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
+        // get velocity without y component
         Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
 
         // get max velocity
@@ -163,54 +171,66 @@ public class Tanc : NetworkBehaviour
             : defaultMaxVelocity;
 
 
-        if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
+        ///////////////////////////////////// REDUCE SPEED IF OVER MAXIMUM VELOCITY ///////////////////////////
+        // if the user is trying to move and current velocity > maximum velocity:
+        // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
+        // This is only run whilst on the ground
+        if (!inAir && Move != Vector3.zero && xzVelocity.magnitude > maxV)
         {
-            float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
+            float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
             // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
             rigidBody.AddForce(
-                nonVerticalVelocity.normalized
+                xzVelocity.normalized
                 * (-1 * Move.magnitude * acceleration * aRadian)
-                * (1 + (nonVerticalVelocity.magnitude - maxV) * Time.fixedDeltaTime));
+                * (1 + (xzVelocity.magnitude - maxV) * Time.fixedDeltaTime));
         }
-        //print(nonVerticalVelocity.magnitude);
-        // apply new movement input
-        if (inAir)
-        {
-            float dot = (Vector3.Dot(xzVelocity.normalized, Move.normalized));
 
-            // TRY ADDING CURRENT AND NEW VELOCITY AND THEN CAPPING IT AT CURRENT VELOCITY MAGNITUDE? maybe not, its working dont touch it.
+
+        ///////////////////////////////////// APPLY NEW MOVEMENT ///////////////////////////
+        if (inAir)  // AIR CONTROL
+        {
+            // use dot product to determine how aligned or misaligned current velocity and movement input are
+            float dot = Vector3.Dot(xzVelocity.normalized, Move.normalized); 
 
             if (Move != Vector3.zero)
             {
-                if (DotNotForward(dot))
+                // if movement inputted is not aligned with current momentum
+                if (DotNotForward(dot))  
                 {
+                    // AIR STRAFE
+                    // if movement inputted is nearly perpendicular to current momentum (within custom threshold):
+                    //       use slerp toredirect velocity with a certain level effectiveness (which scales linearly with the inverse of the dot product)
                     if (DotNotDirectlyBackwards(dot))
                         rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
                             * xzVelocity.magnitude
                             + new Vector3(0, rigidBody.velocity.y, 0);
+
+                    // JUMP PEEK
+                    // if movement inputted is directly opposite to current momentum (within custom threshold):
+                    //      redirect momentum using lerp
                     else
                         rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f)
                             + new Vector3(0, rigidBody.velocity.y, 0);
                 }
 
-                if (xzVelocity.magnitude < TESTINGAirMaxV)
+                // if velocity is below a custom threshold:
+                //      allow some amount of movement
+                if (xzVelocity.magnitude < lowVelocityAirControlThreshold)
                     rigidBody.AddForce(Move * acceleration);
             }
         }
-        else
+        else  // GROUND MOVEMENT
         {
             rigidBody.AddForce(Move * acceleration);
         }
 
-        Move = Move.normalized;
-        Move *= acceleration;
 
-        // decelleration (if not inputting movement)
+        ///////////////////////////////////// DECELLERATION (if not inputting movement) ///////////////////////////
         if (Move.magnitude < 0.1f && !inAir)
         {
-            if (nonVerticalVelocity.magnitude < 0.1f)
+            if (xzVelocity.magnitude < 0.1f)
             {
                 rigidBody.velocity = new Vector3(0, rigidBody.velocity.y, 0);
             }
