@@ -99,7 +99,7 @@ public class Tanc : NetworkBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
     }
 
@@ -177,13 +177,11 @@ public class Tanc : NetworkBehaviour
                 if (dot <= 0.1f)
                 {
                     if (dot >= -0.8f)
-                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.12f) * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.08f) * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
                     else
-                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f) + new Vector3(0, rigidBody.velocity.y, 0);
+                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.05f) + new Vector3(0, rigidBody.velocity.y, 0);
                 }
             }
-            else
-                rigidBody.AddForce(Move * 20);
         }
         else
         {
