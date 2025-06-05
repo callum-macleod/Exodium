@@ -41,6 +41,9 @@ public class Tanc : NetworkBehaviour
     //TEMP
     public NetworkObject nade;
 
+    public float slerpStrength;
+    public float a;
+    public float c;
 
     void Awake()
     {
@@ -99,7 +102,7 @@ public class Tanc : NetworkBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
     }
 
@@ -138,6 +141,16 @@ public class Tanc : NetworkBehaviour
         inAir = !Physics.SphereCast(origin, rayRadius, Vector3.down, out RaycastHit hit, rayRange, Utils.LayerToLayerMask(Layers.SolidGround));
     }
 
+    bool DotNotForward(float dot)
+    {
+        return dot <= 0.1f;
+    }
+
+    bool DotNotDirectlyBackwards(float dot)
+    {
+        return dot >= -0.8f;
+    }
+
     // redistribute velocity
     void CalculateMovement()
     {
@@ -151,39 +164,69 @@ public class Tanc : NetworkBehaviour
 
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
-        if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
+        //if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
+        //{
+        //    float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
+        //    float aRadian = Mathf.Abs(A / 180);
+
+        //    // reduce velocity in current direction
+        //    rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
+
+        //    //rigidBody.velocity = nonVerticalVelocity.normalized * maxV + new Vector3(0, rigidBody.velocity.y, 0);
+        //}
+
+
+        if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
         {
-            //float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
-            //float aRadian = Mathf.Abs(A / 180);
+            float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
+            float aRadian = Mathf.Abs(A / 180);
 
-            //// reduce velocity in current direction
-            //rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
-
-            rigidBody.velocity = nonVerticalVelocity.normalized * maxV + new Vector3(0, rigidBody.velocity.y, 0);
+            // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
+            rigidBody.AddForce(
+                nonVerticalVelocity.normalized
+                * (-1 * Move.magnitude * acceleration * aRadian)
+                * (1 + (nonVerticalVelocity.magnitude - maxV) * Time.fixedDeltaTime));
         }
-
+        print(nonVerticalVelocity.magnitude);
         // apply new movement input
         if (inAir)
         {
             float dot = (Vector3.Dot(xzVelocity.normalized, Move.normalized));
-            float dot2 = (Vector3.Dot(xzVelocity.normalized, (Move + xzVelocity.normalized).normalized));
+            //float dot2 = (Vector3.Dot(xzVelocity.normalized, (Move + xzVelocity.normalized).normalized));
 
-            print(dot);
+            //print(dot);
 
             // TRY ADDING CURRENT AND NEW VELOCITY AND THEN CAPPING IT AT CURRENT VELOCITY MAGNITUDE? maybe not, its working dont touch it.
 
             if (Move != Vector3.zero)
             {
-                if (dot <= 0.1f)
+                if (DotNotForward(dot))
                 {
-                    if (dot >= -0.8f)
-                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.12f) * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+                    if (DotNotDirectlyBackwards(dot))
+                    {
+                        // C
+                        //float slerpStrengthModifier = Mathf.Pow(a, 1 - Mathf.Abs(dot) - c);
+                        //Vector3 slerp = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * slerpStrengthModifier);
+                        //rigidBody.velocity = slerp * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+                        //print(slerpStrengthModifier);
+
+                        //B
+                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
+                            * xzVelocity.magnitude
+                            + new Vector3(0, rigidBody.velocity.y, 0);
+
+                        //// C
+                        //rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.12f)
+                        //    * xzVelocity.magnitude
+                        //    + new Vector3(0, rigidBody.velocity.y, 0);
+                    }
                     else
-                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f) + new Vector3(0, rigidBody.velocity.y, 0);
+                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f)
+                            + new Vector3(0, rigidBody.velocity.y, 0);
                 }
+                //else
+                //    rigidBody.AddForce(Move * 20);
             }
-            else
-                rigidBody.AddForce(Move * 20);
         }
         else
         {
