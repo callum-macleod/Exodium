@@ -24,7 +24,7 @@ public class Tanc : NetworkBehaviour
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 25; // force multiplier to deceleration force
     int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
-    float jumpForce = 7.25f; // force of the jump
+    float jumpForce = 7.5f; // force of the jump
     public Vector3 Move { get; private set; }
     bool inAir = true;
 
@@ -42,8 +42,8 @@ public class Tanc : NetworkBehaviour
     public NetworkObject nade;
 
     public float slerpStrength;
-    public float a;
-    public float c;
+    public bool elseIf;
+    private float TESTINGAirMaxV = 4;
 
     void Awake()
     {
@@ -162,19 +162,6 @@ public class Tanc : NetworkBehaviour
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
-        // if the user is trying to move and current velocity > maximum velocity:
-        // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
-        //if (Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
-        //{
-        //    float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
-        //    float aRadian = Mathf.Abs(A / 180);
-
-        //    // reduce velocity in current direction
-        //    rigidBody.AddForce(nonVerticalVelocity.normalized * (-1 * Move.magnitude * aRadian));
-
-        //    //rigidBody.velocity = nonVerticalVelocity.normalized * maxV + new Vector3(0, rigidBody.velocity.y, 0);
-        //}
-
 
         if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
         {
@@ -187,14 +174,11 @@ public class Tanc : NetworkBehaviour
                 * (-1 * Move.magnitude * acceleration * aRadian)
                 * (1 + (nonVerticalVelocity.magnitude - maxV) * Time.fixedDeltaTime));
         }
-        print(nonVerticalVelocity.magnitude);
+        //print(nonVerticalVelocity.magnitude);
         // apply new movement input
         if (inAir)
         {
             float dot = (Vector3.Dot(xzVelocity.normalized, Move.normalized));
-            //float dot2 = (Vector3.Dot(xzVelocity.normalized, (Move + xzVelocity.normalized).normalized));
-
-            //print(dot);
 
             // TRY ADDING CURRENT AND NEW VELOCITY AND THEN CAPPING IT AT CURRENT VELOCITY MAGNITUDE? maybe not, its working dont touch it.
 
@@ -203,29 +187,16 @@ public class Tanc : NetworkBehaviour
                 if (DotNotForward(dot))
                 {
                     if (DotNotDirectlyBackwards(dot))
-                    {
-                        // C
-                        //float slerpStrengthModifier = Mathf.Pow(a, 1 - Mathf.Abs(dot) - c);
-                        //Vector3 slerp = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * slerpStrengthModifier);
-                        //rigidBody.velocity = slerp * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
-                        //print(slerpStrengthModifier);
-
-                        //B
                         rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
                             * xzVelocity.magnitude
                             + new Vector3(0, rigidBody.velocity.y, 0);
-
-                        //// C
-                        //rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.12f)
-                        //    * xzVelocity.magnitude
-                        //    + new Vector3(0, rigidBody.velocity.y, 0);
-                    }
                     else
                         rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f)
                             + new Vector3(0, rigidBody.velocity.y, 0);
                 }
-                //else
-                //    rigidBody.AddForce(Move * 20);
+
+                if (xzVelocity.magnitude < TESTINGAirMaxV)
+                    rigidBody.AddForce(Move * acceleration);
             }
         }
         else
