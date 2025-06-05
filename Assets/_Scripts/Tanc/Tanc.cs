@@ -25,7 +25,7 @@ public class Tanc : NetworkBehaviour
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 25; // force multiplier to deceleration force
     int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
-    float jumpForce = 7.25f; // force of the jump
+    float jumpForce = 7.5f; // force of the jump
     public Vector3 Move { get; private set; }
     bool inAir = true;
 
@@ -42,12 +42,8 @@ public class Tanc : NetworkBehaviour
     //TEMP
     public NetworkObject nade;
 
-    // used for air strafing calculations
-    public float airStrafeThreshold = 0.8f;
-    public float c = 4; // constant value
-    public float m = 2; // exponential value
-
-    public float z = 1f;  // determines how quickly you slow down when exceeding maximum velocity (whilst on the ground)
+    public float slerpStrength;
+    private float lowVelocityAirControlThreshold = 4;
 
 
     void Awake()
@@ -93,8 +89,6 @@ public class Tanc : NetworkBehaviour
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
         {
-            float minDot = weaponPickupAngle;
-
             if (Physics.SphereCast(VerticalRotator.position, 1f, VerticalRotator.forward, out RaycastHit hit, pickupRange, Utils.LayerToLayerMask(Layers.Weapon)))
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
@@ -120,7 +114,7 @@ public class Tanc : NetworkBehaviour
         float zMov = Input.GetAxisRaw("Vertical");
 
         // get inputted movement relative to the rotator/camera rotation
-        Move = (Utils.RemoveY(HorizontalRotator.forward) * zMov + HorizontalRotator.right * xMov).normalized * acceleration;
+        Move = ((HorizontalRotator.forward) * zMov + HorizontalRotator.right * xMov);
 
         CalculateMovement();
 
@@ -139,73 +133,99 @@ public class Tanc : NetworkBehaviour
         inAir = !Physics.SphereCast(origin, rayRadius, Vector3.down, out RaycastHit hit, rayRange, Utils.LayerToLayerMask(Layers.SolidGround));
     }
 
+    /// <summary>
+    /// if movement input not forward (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
+    bool DotNotForward(float dot)
+    {
+        return dot <= 0.1f;
+    }
+
+
+    /// <summary>
+    /// if movement input not directly backwards (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
+    bool DotNotDirectlyBackwards(float dot)
+    {
+        return dot >= -0.8f;
+    }
+
     // redistribute velocity
     void CalculateMovement()
     {
-        ///////////////////////////////////// HELPER VARIABLES ///////////////////////////
-        Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
+        // get velocity without y component
+        Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
 
         // get max velocity
         float maxV = weapons.ContainsKey(equippedWeaponSlot)
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
-        // get dot product between current (non vertical) velocity and inputted movement direction
-        Vector3 sumOfVelocityAndInput = Move.normalized + nonVerticalVelocity.normalized;
-        float dotSOVAI = Vector3.Dot(Move.normalized, sumOfVelocityAndInput.normalized);  // dot product of Move and sumOfVelocityAndInput
-
-        float dot2 = Vector3.Dot(Move.normalized, nonVerticalVelocity.normalized);  // dot product of move and nonVerticalVelocity
-
 
         ///////////////////////////////////// REDUCE SPEED IF OVER MAXIMUM VELOCITY ///////////////////////////
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
-        if (!inAir && Move != Vector3.zero && nonVerticalVelocity.magnitude > maxV)
+        // This is only run whilst on the ground
+        if (!inAir && Move != Vector3.zero && xzVelocity.magnitude > maxV)
         {
-            float A = Vector3.SignedAngle(nonVerticalVelocity * -1, Move, new Vector3(1, 0, 1));
+            float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
             // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
             rigidBody.AddForce(
-                nonVerticalVelocity.normalized
-                * (-1 * Move.magnitude * aRadian)
-                * (1 + (nonVerticalVelocity.magnitude - maxV) * z * Time.fixedDeltaTime));
+                xzVelocity.normalized
+                * (-1 * Move.magnitude * acceleration * aRadian)
+                * (1 + (xzVelocity.magnitude - maxV) * Time.fixedDeltaTime));
         }
 
 
         ///////////////////////////////////// APPLY NEW MOVEMENT ///////////////////////////
-        
-        if (inAir)  // AIR STRAFING
+        if (inAir)  // AIR CONTROL
         {
-            float inverseAbsDotSOVAI = 1 - Mathf.Abs(dotSOVAI);
+            // use dot product to determine how aligned or misaligned current velocity and movement input are
+            float dot = Vector3.Dot(xzVelocity.normalized, Move.normalized); 
 
-            if (inverseAbsDotSOVAI < airStrafeThreshold)
+            if (Move != Vector3.zero)
             {
-                float angleDiff = Vector3.SignedAngle(nonVerticalVelocity, nonVerticalVelocity + Move, Vector3.up);  // find the difference in y rotation between nonVV and nonVV + Move
-                float redirectionStrength = Mathf.Pow(m, Mathf.Abs(inverseAbsDotSOVAI) - c);  // y = m^x - C  (exponential curve, plug into desmos for vague idea)
-                float redirection = angleDiff * redirectionStrength;  // multiply both together to find redirection
-                Quaternion rot = Quaternion.Euler(0, redirection, 0); // use this to create quaternion
+                // if movement inputted is not aligned with current momentum
+                if (DotNotForward(dot))  
+                {
+                    // AIR STRAFE
+                    // if movement inputted is nearly perpendicular to current momentum (within custom threshold):
+                    //       use slerp toredirect velocity with a certain level effectiveness (which scales linearly with the inverse of the dot product)
+                    if (DotNotDirectlyBackwards(dot))
+                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
+                            * xzVelocity.magnitude
+                            + new Vector3(0, rigidBody.velocity.y, 0);
 
-                // if movement inputted, redirect the existing velocity with a certain degree of effectiveness (determined by angles and dot products above)
-                if (Move != Vector3.zero)
-                    rigidBody.velocity = Vector3.up * rigidBody.velocity.y + rot * nonVerticalVelocity;
+                    // JUMP PEEK
+                    // if movement inputted is directly opposite to current momentum (within custom threshold):
+                    //      redirect momentum using lerp
+                    else
+                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f)
+                            + new Vector3(0, rigidBody.velocity.y, 0);
+                }
+
+                // if velocity is below a custom threshold:
+                //      allow some amount of movement
+                if (xzVelocity.magnitude < lowVelocityAirControlThreshold)
+                    rigidBody.AddForce(Move * acceleration);
             }
-
-            // allows you to hold S (or whichever button is appropriate at the time) to counteract your momentum
-            if (dot2 < -0.25)
-            //if (dot2 < -0.25 || nonVerticalVelocity.magnitude < 0.2)
-                rigidBody.AddForce(Mathf.Abs(dot2) * Move);
         }
         else  // GROUND MOVEMENT
         {
-            rigidBody.AddForce(Move);
+            rigidBody.AddForce(Move * acceleration);
         }
 
 
         ///////////////////////////////////// DECELLERATION (if not inputting movement) ///////////////////////////
         if (Move.magnitude < 0.1f && !inAir)
         {
-            if (nonVerticalVelocity.magnitude < 0.1f)
+            if (xzVelocity.magnitude < 0.1f)
             {
                 rigidBody.velocity = new Vector3(0, rigidBody.velocity.y, 0);
             }
