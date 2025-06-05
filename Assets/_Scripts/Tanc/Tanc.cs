@@ -45,6 +45,21 @@ public class Tanc : NetworkBehaviour
     public float slerpStrength;
     private float lowVelocityAirControlThreshold = 4;
 
+    private bool kTDashing = false;
+    public float kTDashDuration = 0.5f;
+    private float currentKTDashDuration = 0f;
+    public float kTDashVelocity = 15;
+    private Vector3 currentKTDashDir;
+    private float kTDashCD = 1f;
+    private float currentKTDashCD = 0f;
+    public float kTDashExitV = 3;
+
+    private bool kTSkating = false;
+    public float kTSkateDuration;
+    public float currentKTSkateDuration;
+    private float kTSkateCD = 3f;
+    private float currentKTSkateCD = 0f;
+
 
     void Awake()
     {
@@ -66,9 +81,18 @@ public class Tanc : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        if (currentKTDashCD > 0)
+            currentKTDashCD -= Time.deltaTime;
+        if (currentKTSkateCD > 0)
+            currentKTSkateCD -= Time.deltaTime;
+
         // jump
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir)
+        {
             rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
+            //if (kTDashing)
+            //    CancelKTDash(false);
+        }
 
         // equip weapons
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -83,7 +107,7 @@ public class Tanc : NetworkBehaviour
             DropWeaponRpc(equippedWeaponSlot);
 
         // throw nade
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.C))
             ThrowNadeRpc();
 
         // pickup weapon
@@ -103,6 +127,21 @@ public class Tanc : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
+
+        if (Input.GetKey(KeyCode.E)
+            && currentKTDashCD <= 0
+            && (Input.GetAxisRaw("Vertical") + Input.GetAxisRaw("Horizontal")) != 0)
+        {
+            StartKTDash();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (!kTSkating)
+                StartKTSkate();
+            else
+                CancelKTSkate();
+        }
     }
 
     private void FixedUpdate()
@@ -124,6 +163,9 @@ public class Tanc : NetworkBehaviour
         rigidBody.AddForce(Physics.gravity * x, ForceMode.Acceleration);
 
         GroundCheck(groundCheckRayRadius, groundCheckRayRange);
+
+        if (kTDashing) KTDash();
+        if (kTSkating) KTSkate();
     }
 
     void GroundCheck(float rayRadius, float rayRange)
@@ -157,6 +199,8 @@ public class Tanc : NetworkBehaviour
     // redistribute velocity
     void CalculateMovement()
     {
+        if (kTDashing) return;
+
         // get velocity without y component
         Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
 
@@ -170,7 +214,7 @@ public class Tanc : NetworkBehaviour
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         // This is only run whilst on the ground
-        if (!inAir && Move != Vector3.zero && xzVelocity.magnitude > maxV)
+        if (!inAir && !kTSkating && Move != Vector3.zero && xzVelocity.magnitude > maxV)
         {
             float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
@@ -184,7 +228,7 @@ public class Tanc : NetworkBehaviour
 
 
         ///////////////////////////////////// APPLY NEW MOVEMENT ///////////////////////////
-        if (inAir)  // AIR CONTROL
+        if (inAir || kTSkating)  // AIR CONTROL
         {
             // use dot product to determine how aligned or misaligned current velocity and movement input are
             float dot = Vector3.Dot(xzVelocity.normalized, Move.normalized); 
@@ -223,7 +267,7 @@ public class Tanc : NetworkBehaviour
 
 
         ///////////////////////////////////// DECELLERATION (if not inputting movement) ///////////////////////////
-        if (Move.magnitude < 0.1f && !inAir)
+        if (Move.magnitude < 0.1f && !inAir && !kTSkating)
         {
             if (xzVelocity.magnitude < 0.1f)
             {
@@ -336,23 +380,66 @@ public class Tanc : NetworkBehaviour
 
 
 
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    if (collision.gameObject.layer == (int)Layers.SolidGround)
-    //        inAir = false;
-    //}
-
-    //private void OnCollisionExit(Collision collision)
-    //{
-    //    if (collision.gameObject.layer == (int)Layers.SolidGround)
-    //        inAir = true;
-    //}
-
     [Rpc(SendTo.Server)]
     private void ThrowNadeRpc()
     {
         NetworkObject nadeTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(nade, OwnerClientId);
 
         nadeTemp.GetComponent<NadeScript>().InitializeTransformRpc(VerticalRotator.transform.position + VerticalRotator.transform.forward * 2, VerticalRotator.transform.rotation);
+    }
+
+    private void StartKTDash()
+    {
+        kTDashing = true;
+        currentKTDashDuration = kTDashDuration;
+        currentKTDashCD = kTDashCD;
+        currentKTDashDir = ((HorizontalRotator.forward) * Input.GetAxisRaw("Vertical") + HorizontalRotator.right * Input.GetAxisRaw("Horizontal"));
+    }
+
+    private void KTDash()
+    {
+        if (currentKTDashDuration <= 0)
+        {
+            CancelKTDash(true);
+            return;
+        }
+
+        currentKTDashDuration -= Time.fixedDeltaTime;
+
+        rigidBody.velocity = currentKTDashDir.normalized * kTDashVelocity;
+    }
+
+    private void CancelKTDash(bool stopMomentum)
+    {
+        kTDashing = false;
+        if (stopMomentum)
+            rigidBody.velocity = kTDashExitV * Move.normalized;
+        else
+            rigidBody.velocity *= 1;
+
+        currentKTDashDuration = 0;
+    }
+
+    private void StartKTSkate()
+    {
+        currentKTSkateCD = kTSkateCD;
+        kTSkating = true;
+
+        if (kTDashing)
+            CancelKTDash(false);
+    }
+
+    private void KTSkate()
+    {
+        if (currentKTSkateCD <= 0)
+        {
+            CancelKTSkate();
+            return;
+        }
+    }
+
+    private void CancelKTSkate()
+    {
+        kTSkating = false;
     }
 }
