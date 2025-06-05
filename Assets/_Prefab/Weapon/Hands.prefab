@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6058876384389910593}
   - component: {fileID: 2577400686950731449}
   - component: {fileID: -296023416599972927}
+  - component: {fileID: -4378263547720862246}
   m_Layer: 7
   m_Name: Hands
   m_TagString: Untagged
@@ -122,8 +123,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponID: 0
+  ShootSfx: {fileID: 0}
   AttachedTanc: {fileID: 0}
-  StartAsDetached: 0
 --- !u!136 &6058876384389910593
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -205,3 +206,26 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!1773428102 &-4378263547720862246
+ParentConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7265506205423455575}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Weight: 1
+  m_TranslationAtRest: {x: 0, y: 0, z: 0}
+  m_RotationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationOffsets: []
+  m_RotationOffsets: []
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_Active: 0
+  m_IsLocked: 0
+  m_Sources: []

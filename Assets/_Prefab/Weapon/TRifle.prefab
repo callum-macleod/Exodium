@@ -113,6 +113,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2145197616583752900}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3447138644475111304}
   m_SourcePrefab: {fileID: 100100000, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
 --- !u!4 &6034419833842922473 stripped
 Transform:
@@ -136,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2267614376
+  GlobalObjectIdHash: 2321940435
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -241,3 +244,26 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!1773428102 &3447138644475111304
+ParentConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6410100500443113811}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Weight: 1
+  m_TranslationAtRest: {x: -3.7900007, y: 4.56, z: -1.9307992}
+  m_RotationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationOffsets: []
+  m_RotationOffsets: []
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_Active: 0
+  m_IsLocked: 0
+  m_Sources: []

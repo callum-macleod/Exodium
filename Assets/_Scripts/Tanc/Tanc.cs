@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using JetBrains.Annotations;
+using UnityEngine.Animations;
 
 public class Tanc : NetworkBehaviour
 {
@@ -128,13 +129,6 @@ public class Tanc : NetworkBehaviour
         float x = (rigidBody.velocity.y <= 0) ? 1 : 0.7f;
         rigidBody.AddForce(Physics.gravity * x, ForceMode.Acceleration);
 
-
-        if (weapons.ContainsKey(equippedWeaponSlot))
-        {
-            weapons[equippedWeaponSlot].transform.position = weaponSpace.transform.position;
-            weapons[equippedWeaponSlot].transform.rotation = weaponSpace.transform.rotation;
-        }
-
         GroundCheck(groundCheckRayRadius, groundCheckRayRange);
     }
 
@@ -199,6 +193,7 @@ public class Tanc : NetworkBehaviour
 
             // allows you to hold S (or whichever button is appropriate at the time) to counteract your momentum
             if (dot2 < -0.25)
+            //if (dot2 < -0.25 || nonVerticalVelocity.magnitude < 0.2)
                 rigidBody.AddForce(Mathf.Abs(dot2) * Move);
         }
         else  // GROUND MOVEMENT
@@ -279,14 +274,22 @@ public class Tanc : NetworkBehaviour
     public void Attach(GameObject weapon, Weapons weaponID, WeaponSlot slot)
     {
 
-        print($"{{LOCAL}} NOID: {NetworkObjectId} => attaching {weapon}");
-        // drop weapon in the desired slot
-        DropWeapon(slot);
+            print($"{{LOCAL}} NOID: {NetworkObjectId} => attaching {weapon}");
+            // drop weapon in the desired slot
+            DropWeapon(slot);
 
-        // attach new weapon
-        weapons[slot] = weapon;
-        weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
-        weapons[slot].SetActive(false);
+            // attach new weapon
+            weapons[slot] = weapon;
+            weapons[slot].GetComponent<WeaponBase>().SetIsDetachedIfOwner(false);
+            weapons[slot].SetActive(false);
+
+        if (IsOwner)
+        {
+            ParentConstraint pc = weapons[slot].GetComponent<ParentConstraint>();
+            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = weaponSpace, weight = 1 } };
+            pc.SetSources(constraints);
+            pc.constraintActive = true;
+        }
     }
 
     [Rpc(SendTo.Everyone)]
@@ -308,6 +311,7 @@ public class Tanc : NetworkBehaviour
 
         droppedWeapon.GetComponent<WeaponBase>().SetIsDetachedIfOwner(true);
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
+        droppedWeapon.GetComponent<ParentConstraint>().constraintActive = false;
     }
 
 
