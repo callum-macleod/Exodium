@@ -142,6 +142,7 @@ public class Tanc : NetworkBehaviour
     void CalculateMovement()
     {
         Vector3 nonVerticalVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);  // get velocity without y component
+        Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
 
         // get max velocity
         float maxV = weapons.ContainsKey(equippedWeaponSlot)
@@ -164,22 +165,32 @@ public class Tanc : NetworkBehaviour
         // apply new movement input
         if (inAir)
         {
-            Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
-
+            float dot = (Vector3.Dot(xzVelocity.normalized, Move.normalized));
             float dot2 = (Vector3.Dot(xzVelocity.normalized, (Move + xzVelocity.normalized).normalized));
 
-            print(dot2);
+            print(dot);
 
-            if (dot2 <= 0.3f && dot2 >= -0.8f)
-                rigidBody.velocity = (Move + xzVelocity.normalized).normalized * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+            // TRY ADDING CURRENT AND NEW VELOCITY AND THEN CAPPING IT AT CURRENT VELOCITY MAGNITUDE? maybe not, its working dont touch it.
+
+            if (Move != Vector3.zero)
+            {
+                if (dot <= 0.1f)
+                {
+                    if (dot >= -0.8f)
+                        rigidBody.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, 0.12f) * xzVelocity.magnitude + new Vector3(0, rigidBody.velocity.y, 0);
+                    else
+                        rigidBody.velocity = Vector3.Lerp(xzVelocity, Move.normalized, 0.1f) + new Vector3(0, rigidBody.velocity.y, 0);
+                }
+            }
             else
-                rigidBody.AddForce(Move);
+                rigidBody.AddForce(Move * 20);
         }
         else
         {
             rigidBody.AddForce(Move * acceleration);
         }
 
+        Move = Move.normalized;
         Move *= acceleration;
 
         // decelleration (if not inputting movement)
