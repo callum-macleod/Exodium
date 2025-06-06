@@ -44,6 +44,7 @@ public class Tanc : NetworkBehaviour
 
     public float slerpStrength;
     private float lowVelocityAirControlThreshold = 4;
+    public float airResistanceMult = 1.5f;
 
     private bool kTDashing = false;
     public float kTDashDuration = 0.5f;
@@ -55,10 +56,11 @@ public class Tanc : NetworkBehaviour
     public float kTDashExitV = 3;
 
     private bool kTSkating = false;
-    public float kTSkateDuration;
+    public float kTSkateDuration = 4f;
     public float currentKTSkateDuration;
-    private float kTSkateCD = 3f;
+    private float kTSkateCD = 5f;
     private float currentKTSkateCD = 0f;
+    public GameObject sKT8Indicator;
 
 
     void Awake()
@@ -71,9 +73,8 @@ public class Tanc : NetworkBehaviour
         if (!IsOwner) return;
 
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
-
-        //// make sure ground checker is slightly higher than the ray radius (otherwise sphere cast doesn't work)
-        //GroundChecker.position = Vector3.up * (groundCheckRayRadius + 0.05f);
+        sKT8Indicator = GameObject.FindGameObjectsWithTag("sKT8Indicator")[0];  // temporary mode of finding gameobject - should be improved
+        sKT8Indicator.SetActive(false);
     }
 
 
@@ -214,8 +215,10 @@ public class Tanc : NetworkBehaviour
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         // This is only run whilst on the ground
-        if (!inAir && !kTSkating && Move != Vector3.zero && xzVelocity.magnitude > maxV)
+        if (Move != Vector3.zero && xzVelocity.magnitude > maxV)
+        //if (!inAir && !kTSkating && Move != Vector3.zero && xzVelocity.magnitude > maxV)
         {
+            float strength = (inAir || kTSkating) ? airResistanceMult : 1f;
             float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
@@ -223,7 +226,8 @@ public class Tanc : NetworkBehaviour
             rigidBody.AddForce(
                 xzVelocity.normalized
                 * (-1 * Move.magnitude * acceleration * aRadian)
-                * (1 + (xzVelocity.magnitude - maxV) * Time.fixedDeltaTime));
+                * (1 + (xzVelocity.magnitude - maxV) * Time.fixedDeltaTime)
+                * strength);
         }
 
 
@@ -278,6 +282,22 @@ public class Tanc : NetworkBehaviour
                 rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
             }
         }
+        //if (Move.magnitude < 0.1f || inAir || kTSkating)
+        ////if (Move.magnitude < 0.1f && !inAir && !kTSkating)
+        //{
+        //    float strength = (inAir || kTSkating) ? airResistanceMult : 1f;
+        //    if (xzVelocity.magnitude < 0.1f)
+        //    {
+        //        rigidBody.velocity = new Vector3(0, rigidBody.velocity.y, 0);
+        //    }
+        //    else
+        //    {
+        //        rigidBody.AddForce(
+        //            new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized
+        //            * deceleration
+        //            * strength);
+        //    }
+        //}
     }
 
     [Rpc(SendTo.Everyone)]
@@ -422,8 +442,16 @@ public class Tanc : NetworkBehaviour
 
     private void StartKTSkate()
     {
+        if (kTSkating)
+        {
+            CancelKTSkate();
+            return;
+        }
+
         currentKTSkateCD = kTSkateCD;
+        currentKTSkateDuration = kTSkateDuration;
         kTSkating = true;
+        sKT8Indicator.SetActive(true);
 
         if (kTDashing)
             CancelKTDash(false);
@@ -431,15 +459,19 @@ public class Tanc : NetworkBehaviour
 
     private void KTSkate()
     {
-        if (currentKTSkateCD <= 0)
+        if (currentKTSkateDuration <= 0)
         {
             CancelKTSkate();
             return;
         }
+
+        currentKTSkateDuration -= Time.fixedDeltaTime;
     }
 
     private void CancelKTSkate()
     {
         kTSkating = false;
+        currentKTSkateDuration = 0f;
+        sKT8Indicator.SetActive(false);
     }
 }
