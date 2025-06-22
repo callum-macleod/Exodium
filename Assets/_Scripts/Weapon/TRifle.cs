@@ -46,7 +46,8 @@ public class TRifle : WeaponBase
         // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
         if (inaccuracyScalar > 0 && !Input.GetKey(KeyCode.Mouse0))
         {
-            inaccuracyScalar -= recoilDecayRate * Time.deltaTime;  // this maybe should not be done in update / with Time.deltaTime
+            float multiplier = (inaccuracyScalar > 0.5f) ? 2f : 1f;
+            inaccuracyScalar -= recoilDecayRate * Time.deltaTime * multiplier;  // this maybe should not be done in update / with Time.deltaTime
 
             // handles cases where the rotation is negative
             // e.g. a rotation of -2 will actually be stored as 358. hence, we need to force it to be -2.
