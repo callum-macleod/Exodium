@@ -7,7 +7,7 @@ public class TRifle : WeaponBase
 {
     private float fireDelay;
 
-    public override float MaxVelocity { get; } = 7;
+    public override float MaxVelocity { get; } = 7f;
     protected override int baseDamage { get; set; } = 44;
     protected override float critMultiplier { get; set; } = 3f;
     protected override float limbMultiplier { get; set; } = 0.8f;
@@ -17,27 +17,44 @@ public class TRifle : WeaponBase
 
     [SerializeField] private NetworkObject bulletHolePrefab;
 
+    float inaccuracyScalar = 0;
+    GameObject recoilPointer;
+    float maxVerticalRecoil = -10;
+    [SerializeField] float recoilDecayRate = 1f;
+
 
     protected override void OnUpdate()
     {
         if (!IsOwner)
             return;
 
-        fireDelay -= Time.deltaTime;
+        if (AttachedTanc != null)
+        {
+            fireDelay -= Time.deltaTime;
 
-        if (Input.GetKey(KeyCode.Mouse0))
-            Shoot();
+            if (Input.GetKey(KeyCode.Mouse0))
+                Shoot();
+
+            if (inaccuracyScalar != 0 || transform.localRotation.x != 0)  // if both values are 0: do nothing
+                AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, 0, 0);
+        }
+
+        // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
+        if (inaccuracyScalar > 0 && !Input.GetKey(KeyCode.Mouse0))
+            inaccuracyScalar -= recoilDecayRate * Time.deltaTime;  // this maybe should not be done in update / with Time.deltaTime
     }
 
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
-        SpawnShootFxRpc();
-
         fireDelay = 0.11f;
+        SpawnShootSoundFxRpc();
 
-        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
+        recoilPointer.transform.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, 0, 0);
+
+        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
+        //if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, AttachedTanc.VerticalRotator.forward, out RaycastHit hit, maxDistance))
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
                 print("Tanc hit!");
@@ -48,10 +65,14 @@ public class TRifle : WeaponBase
             if (hit.collider.GetComponent<HitboxScript>() != null)
                 hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
         }
+
+        // increase inaccuracy (cap at 1)
+        inaccuracyScalar += 0.05f;
+        if (inaccuracyScalar > 1) inaccuracyScalar = 1f;
     }
 
     [Rpc(SendTo.Everyone)]
-    private void SpawnShootFxRpc()
+    private void SpawnShootSoundFxRpc()
     {
         Instantiate(ShootSfx, transform.position, transform.rotation);
     }
@@ -61,5 +82,13 @@ public class TRifle : WeaponBase
     {
         NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
         bh.transform.position = pos;
+    }
+
+
+    protected override void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
+    {
+        base.OnAttachedTancNetObjIDChanged(prev, curr);
+
+        recoilPointer = AttachedTanc.RecoilPointer;
     }
 }

@@ -44,7 +44,7 @@ public abstract class WeaponBase : NetworkBehaviour
     }
 
 
-    private void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
+    protected virtual void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
         curr.TryGet(out NetworkObject t);
         AttachedTanc = t.GetComponent<Tanc>();

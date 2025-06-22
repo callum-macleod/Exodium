@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4591427290271229247
 Transform:
   m_ObjectHideFlags: 0
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
-  weaponSpace: {fileID: 3899069240831065462}
+  WeaponSpace: {fileID: 3899069240831065462}
   GroundChecker: {fileID: 5456907068024958997}
   weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
   nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
@@ -304,6 +304,7 @@ MonoBehaviour:
   kTSkateDuration: 4
   currentKTSkateDuration: 0
   sKT8Indicator: {fileID: 0}
+  RecoilPointer: {fileID: 6406331851894003623}
 --- !u!114 &5121455351405466758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,7 +412,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8974660650966727049
 Transform:
   m_ObjectHideFlags: 0
@@ -608,6 +609,37 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!1 &6406331851894003623
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1376576832689583636}
+  m_Layer: 0
+  m_Name: RecoilPointer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1376576832689583636
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6406331851894003623}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.03489949, z: -0, w: 0.99939084}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4587819814955486716}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8257125044094295239
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,6 +670,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1376576832689583636}
   - {fileID: 9101525296389269747}
   - {fileID: 3899069240831065462}
   m_Father: {fileID: 4365428620273654661}
@@ -885,7 +918,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7639535787658608474
 Transform:
   m_ObjectHideFlags: 0

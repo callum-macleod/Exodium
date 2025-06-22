@@ -15,7 +15,7 @@ public class Tanc : NetworkBehaviour
     Rigidbody rigidBody;
     [SerializeField] Transform HorizontalRotator;
     [SerializeField] public Transform VerticalRotator;
-    [SerializeField] Transform weaponSpace;
+    [SerializeField] public Transform WeaponSpace;
 
     [SerializeField] Transform GroundChecker;
     float groundCheckRayRadius = 0.3f;
@@ -64,6 +64,8 @@ public class Tanc : NetworkBehaviour
 
     private float skt8JumpCancelScalar = 0.6f;
 
+
+    public GameObject RecoilPointer;
 
     void Awake()
     {
@@ -375,7 +377,7 @@ public class Tanc : NetworkBehaviour
         if (IsOwner)
         {
             ParentConstraint pc = weapons[slot].GetComponent<ParentConstraint>();
-            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = weaponSpace, weight = 1 } };
+            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = WeaponSpace, weight = 1 } };
             pc.SetSources(constraints);
             pc.constraintActive = true;
         }
