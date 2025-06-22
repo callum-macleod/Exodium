@@ -36,19 +36,29 @@ public class TRifle : WeaponBase
             if (Input.GetKey(KeyCode.Mouse0))
                 Shoot();
 
-            if (inaccuracyScalar != 0 || transform.localRotation.x != 0)  // if both values are 0: do nothing
-                AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, 0, 0);
+            if (inaccuracyScalar != 0)  // update weaponspace to match the recoil angle
+                AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(
+                    recoilPointer.transform.localRotation.eulerAngles.x,
+                    recoilPointer.transform.localRotation.eulerAngles.y,
+                    0);
         }
 
         // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
         if (inaccuracyScalar > 0 && !Input.GetKey(KeyCode.Mouse0))
         {
             inaccuracyScalar -= recoilDecayRate * Time.deltaTime;  // this maybe should not be done in update / with Time.deltaTime
+
+            // handles cases where the rotation is negative
+            // e.g. a rotation of -2 will actually be stored as 358. hence, we need to force it to be -2.
             float currHor = recoilPointer.transform.localRotation.eulerAngles.y;
+            if (currHor > 180) currHor -= 360;
+
+            // reduce recoilPointer rotation
             recoilPointer.transform.localRotation = Quaternion.Euler(
-                recoilPointer.transform.localRotation.eulerAngles.x,
+                maxVerticalRecoil * inaccuracyScalar,
                 currHor * inaccuracyScalar,
-                recoilPointer.transform.localRotation.eulerAngles.z);
+                0);
+            
         }
     }
 
@@ -62,11 +72,6 @@ public class TRifle : WeaponBase
         float currentHorizontal = recoilPointer.transform.localRotation.eulerAngles.y;
         float potentialDeviation = maxHorizontalDeviation * inaccuracyScalar;
         float newHor = currentHorizontal + potentialDeviation * Random.Range(-1f, 1f);
-        print($"{currentHorizontal} + {potentialDeviation * Random.Range(-1f, 1f)} = {newHor}");
-
-        // clamp to some max horizontal recoil
-        //if (Mathf.Abs(newHor) > 5f)
-        //    newHor = Mathf.Abs(newHor) / newHor * 5f;
 
 
         recoilPointer.transform.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, newHor, 0);
