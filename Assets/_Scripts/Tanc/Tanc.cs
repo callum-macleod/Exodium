@@ -62,6 +62,8 @@ public class Tanc : NetworkBehaviour
     private float currentKTSkateCD = 0f;
     public GameObject sKT8Indicator;
 
+    private float skt8JumpCancelScalar = 0.6f;
+
 
     void Awake()
     {
@@ -91,8 +93,11 @@ public class Tanc : NetworkBehaviour
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir)
         {
             rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
-            //if (kTDashing)
-            //    CancelKTDash(false);
+            if (kTDashing)
+            {
+                CancelKTDash(false);
+                rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
+            }
         }
 
         // equip weapons
@@ -131,7 +136,7 @@ public class Tanc : NetworkBehaviour
 
         if (Input.GetKey(KeyCode.E)
             && currentKTDashCD <= 0
-            && (Input.GetAxisRaw("Vertical") + Input.GetAxisRaw("Horizontal")) != 0)
+            && (Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal"))) != 0)
         {
             StartKTDash();
         }
