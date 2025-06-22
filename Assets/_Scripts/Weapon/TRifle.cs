@@ -40,8 +40,8 @@ public class TRifle : WeaponBase
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
                 print("Tanc hit!");
 
-            if (hit.collider.GetComponent<HealthManager>() != null)
-                hit.collider.GetComponent<HealthManager>().ApplyDamageRpc(baseDamage);
+            if (hit.collider.GetComponent<HitboxScript>() != null)
+                hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
         }
     }
 
