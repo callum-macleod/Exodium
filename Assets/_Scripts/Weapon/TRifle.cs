@@ -15,6 +15,8 @@ public class TRifle : WeaponBase
     //private float rayRadius = 0.3f;
     private float maxDistance = 150f;
 
+    [SerializeField] private NetworkObject bulletHolePrefab;
+
 
     protected override void OnUpdate()
     {
@@ -39,6 +41,9 @@ public class TRifle : WeaponBase
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
                 print("Tanc hit!");
+            else if (hit.collider.gameObject.layer == (int)Layers.SolidGround || hit.collider.gameObject.layer == (int)Layers.Default)
+                SpawnBulletHoleRpc(hit.point);
+                    
 
             if (hit.collider.GetComponent<HitboxScript>() != null)
                 hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
@@ -49,5 +54,12 @@ public class TRifle : WeaponBase
     private void SpawnShootFxRpc()
     {
         Instantiate(ShootSfx, transform.position, transform.rotation);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SpawnBulletHoleRpc(Vector3 pos)
+    {
+        NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
+        bh.transform.position = pos;
     }
 }
