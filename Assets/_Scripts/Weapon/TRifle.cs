@@ -22,6 +22,7 @@ public class TRifle : WeaponBase
     readonly float maxVerticalRecoil = -10;
     readonly float maxHorizontalDeviation = 2f;
     readonly float recoilDecayRate = 0.5f;
+    float movePenalty = 0.5f;
 
 
     protected override void OnUpdate()
@@ -59,7 +60,6 @@ public class TRifle : WeaponBase
                 maxVerticalRecoil * inaccuracyScalar,
                 currHor * inaccuracyScalar,
                 0);
-            
         }
     }
 
@@ -70,13 +70,24 @@ public class TRifle : WeaponBase
         fireDelay = 0.11f;
         SpawnShootSoundFxRpc();
 
+        // calculate base inaccuracy
         float currentHorizontal = recoilPointer.transform.localRotation.eulerAngles.y;
         float potentialDeviation = maxHorizontalDeviation * inaccuracyScalar;
         float newHor = currentHorizontal + potentialDeviation * Random.Range(-1f, 1f);
 
-
         recoilPointer.transform.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, newHor, 0);
 
+        // add movement penalty
+        float currentSpeed = AttachedTanc.GetComponent<Rigidbody>().velocity.magnitude;
+        float xPenalty = movePenalty * currentSpeed * Random.Range(-1f, 1f);
+        float yPenalty = movePenalty * currentSpeed * Random.Range(-1f, 1f);
+
+        recoilPointer.transform.localRotation = Quaternion.Euler(
+            recoilPointer.transform.localEulerAngles.x + xPenalty,
+            recoilPointer.transform.localEulerAngles.y + yPenalty,
+            recoilPointer.transform.localEulerAngles.z);
+
+        // perform raycast
         if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
@@ -87,6 +98,10 @@ public class TRifle : WeaponBase
 
             if (hit.collider.GetComponent<HitboxScript>() != null)
                 hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
+
+
+            //LineRenderer lr = gameObject.AddComponent<LineRenderer>();
+            //lr.SetPositions(new Vector3[] {AttachedTanc.VerticalRotator.position, hit.point});
         }
 
         // increase inaccuracy (cap at 1)
