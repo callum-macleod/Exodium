@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ public class TRifle : WeaponBase
     private float maxDistance = 150f;
 
     [SerializeField] Transform tip;
-    [SerializeField] private NetworkObject bulletHolePrefab;
+    [SerializeField] private GameObject bulletHolePrefab;
 
     float inaccuracyScalar = 0;
     GameObject recoilPointer;
@@ -30,7 +29,7 @@ public class TRifle : WeaponBase
     readonly float recoilDecayRate = 0.5f;
     float movePenalty = 0.5f;
     [SerializeField] float BulletSpeed = 200f;
-    [SerializeField] TrailRenderer BulletTrail;
+    [SerializeField] GameObject BulletTrail;
 
     private void Start()
     {
@@ -117,19 +116,16 @@ public class TRifle : WeaponBase
         if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
-                print("Tanc hit!");
-            else if (hit.collider.gameObject.layer == (int)Layers.SolidGround || hit.collider.gameObject.layer == (int)Layers.Default)
-                SpawnBulletHoleRpc(hit.point);
+                hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
 
+            //else if (hit.collider.gameObject.layer == (int)Layers.SolidGround || hit.collider.gameObject.layer == (int)Layers.Default)
+            SpawnBulletVisualsRpc(hit.point, true);
 
-            TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity);
-            StartCoroutine(SpawnTrail(trail, hit.point, hit.normal, true));
         }
         // do animation even if it doesn't hit anything
         else
         {
-            TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity);
-            StartCoroutine(SpawnTrail(trail, recoilPointer.transform.position + recoilPointer.transform.forward * 100, Vector3.zero, false));
+            SpawnBulletVisualsRpc(recoilPointer.transform.position + recoilPointer.transform.forward * 100, false);
         }
 
         // increase inaccuracy (cap at 1)
@@ -143,12 +139,12 @@ public class TRifle : WeaponBase
         Instantiate(ShootSfx, transform.position, transform.rotation);
     }
 
-    [Rpc(SendTo.Server)]
-    private void SpawnBulletHoleRpc(Vector3 pos)
-    {
-        NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
-        bh.transform.position = pos;
-    }
+    //[Rpc(SendTo.Server)]
+    //private void SpawnBulletHoleRpc(Vector3 pos)
+    //{
+    //    NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
+    //    bh.transform.position = pos;
+    //}
 
 
     protected override void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
@@ -158,8 +154,28 @@ public class TRifle : WeaponBase
         recoilPointer = AttachedTanc.RecoilPointer;
     }
 
+
+
+    [Rpc(SendTo.Everyone)]
+    private void SpawnBulletVisualsRpc(Vector3 hitPoint, bool spawnHole = false)
+    {
+        // spawn trail
+        //TrailRenderer trail = NetworkManager.SpawnManager.InstantiateAndSpawn(BulletTrail).GetComponent<TrailRenderer>();
+        //trail.transform.position = tip.position;
+        TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity).GetComponent<TrailRenderer>();
+        StartCoroutine(SpawnTrail(trail, hitPoint));
+
+        // spawn hole
+        if (spawnHole)
+        {
+            Instantiate(bulletHolePrefab, hitPoint, Quaternion.identity);
+            //NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
+            //bh.transform.position = hitPoint;
+        }
+    }
+
     // trail logic adapted from: https://github.com/llamacademy/raycast-bullet-trails/blob/main/Assets/Scripts/Gun.cs
-    private IEnumerator SpawnTrail(TrailRenderer Trail, Vector3 HitPoint, Vector3 HitNormal, bool MadeImpact)
+    private IEnumerator SpawnTrail(TrailRenderer Trail, Vector3 HitPoint)
     {
         // This has been updated from the video implementation to fix a commonly raised issue about the bullet trails
         // moving slowly when hitting something close, and not
