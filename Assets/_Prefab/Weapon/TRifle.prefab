@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2267614376
+  GlobalObjectIdHash: 2321940435
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -164,9 +164,9 @@ MonoBehaviour:
   ShootSfx: {fileID: 8236992411107391694, guid: b89a73c21aa7f374da3d348eb120d63a, type: 3}
   AttachedTanc: {fileID: 0}
   tip: {fileID: 2962481457900975431}
-  bulletHolePrefab: {fileID: -952615783769831093, guid: 0d09ac934d73b6749a44fed56d6f385f, type: 3}
+  bulletHolePrefab: {fileID: 3828570691383077520, guid: 0d09ac934d73b6749a44fed56d6f385f, type: 3}
   BulletSpeed: 300
-  BulletTrail: {fileID: 4000859839480311283, guid: 2eb4446fb9fe67942b3df840022bdc10, type: 3}
+  BulletTrail: {fileID: 4748658696004837488, guid: 2eb4446fb9fe67942b3df840022bdc10, type: 3}
 --- !u!136 &8593088133392927745
 CapsuleCollider:
   m_ObjectHideFlags: 0
