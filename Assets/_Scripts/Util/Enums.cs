@@ -18,7 +18,8 @@ public enum WeaponSlot
 {
     Primary = 0,
     Secondary,
-    Melee
+    Melee,
+    Package,
 }
 
 public enum Weapons
@@ -26,4 +27,5 @@ public enum Weapons
     Hands = 0,
     Spud,
     TRifle,
+    Package,
 }

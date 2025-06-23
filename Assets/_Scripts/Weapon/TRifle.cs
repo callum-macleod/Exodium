@@ -26,7 +26,7 @@ public class TRifle : WeaponBase
     protected override float critMultiplier { get; set; } = 3f;
     protected override float limbMultiplier { get; set; } = 0.8f;
     public override WeaponSlot WeaponSlot { get; } = WeaponSlot.Primary;
-    //private float rayRadius = 0.3f;
+
     private float maxDistance = 150f;
 
     [SerializeField] Transform tip;

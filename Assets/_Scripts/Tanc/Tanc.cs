@@ -74,6 +74,9 @@ public class Tanc : NetworkBehaviour
 
     public GameObject RecoilPointer;
 
+    // for testing
+    public NetworkObject Package;
+
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
@@ -116,6 +119,8 @@ public class Tanc : NetworkBehaviour
             EquipWeaponRpc(WeaponSlot.Secondary);
         if (Input.GetKeyDown(KeyCode.Alpha3))
             EquipWeaponRpc(WeaponSlot.Melee);
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+            EquipWeaponRpc(WeaponSlot.Package);
 
         // drop weapon
         if (Input.GetKeyDown(KeyCode.G))
@@ -140,9 +145,11 @@ public class Tanc : NetworkBehaviour
             }
         }
 
+        // big burst of movement for debugging/testing
         if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
 
+        // KTDash
         if (Input.GetKey(KeyCode.E)
             && currentKTDashCD <= 0
             && (Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal"))) != 0)
@@ -150,6 +157,7 @@ public class Tanc : NetworkBehaviour
             StartKTDash();
         }
 
+        // SKT8
         if (Input.GetKeyDown(KeyCode.Q))
         {
             if (!kTSkating)
@@ -158,10 +166,18 @@ public class Tanc : NetworkBehaviour
                 CancelKTSkate();
         }
 
+        // crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
             ToggleCrouchRpc(true);
         if (Input.GetKeyUp(KeyCode.LeftControl))
             ToggleCrouchRpc(false);
+
+        // spawn Package (testing
+        if (Input.GetKeyDown(KeyCode.CapsLock))
+        {
+            NetworkObject p = NetworkManager.SpawnManager.InstantiateAndSpawn(Package);
+            p.transform.position = Vector3.up * 3f;
+        }
     }
 
     private void FixedUpdate()
@@ -302,22 +318,6 @@ public class Tanc : NetworkBehaviour
                 rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
             }
         }
-        //if (Move.magnitude < 0.1f || inAir || kTSkating)
-        ////if (Move.magnitude < 0.1f && !inAir && !kTSkating)
-        //{
-        //    float strength = (inAir || kTSkating) ? airResistanceMult : 1f;
-        //    if (xzVelocity.magnitude < 0.1f)
-        //    {
-        //        rigidBody.velocity = new Vector3(0, rigidBody.velocity.y, 0);
-        //    }
-        //    else
-        //    {
-        //        rigidBody.AddForce(
-        //            new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized
-        //            * deceleration
-        //            * strength);
-        //    }
-        //}
     }
 
     [Rpc(SendTo.Everyone)]
@@ -327,7 +327,7 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
 
-        weapons[equippedWeaponSlot].GetComponent<TRifle>().ResetInaccuracyToZero();
+        weapons[equippedWeaponSlot].GetComponent<TRifle>()?.ResetInaccuracyToZero();
 
         // unequip current weapon
         if (weapons.TryGetValue(equippedWeaponSlot, out fuckoff))
