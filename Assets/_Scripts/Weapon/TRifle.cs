@@ -56,8 +56,9 @@ public class TRifle : WeaponBase
                     0);
         }
 
+        // recover from recoil over time (decay)
         // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
-        if (inaccuracyScalar > 0 && !Input.GetKey(KeyCode.Mouse0))
+        if (inaccuracyScalar > 0 && (!Input.GetKey(KeyCode.Mouse0) || reloadStartTime + reloadTime > Time.time))
         {
             float multiplier = (inaccuracyScalar > 0.5f) ? 2f : 1f;
             inaccuracyScalar -= recoilDecayRate * Time.deltaTime * multiplier;  // this maybe should not be done in update / with Time.deltaTime
@@ -128,7 +129,7 @@ public class TRifle : WeaponBase
         else
         {
             TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity);
-            StartCoroutine(SpawnTrail(trail, recoilPointer.transform.forward, Vector3.zero, false));
+            StartCoroutine(SpawnTrail(trail, recoilPointer.transform.position + recoilPointer.transform.forward * 100, Vector3.zero, false));
         }
 
         // increase inaccuracy (cap at 1)
