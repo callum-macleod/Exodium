@@ -15,6 +15,7 @@ public class TRifle : WeaponBase
     //private float rayRadius = 0.3f;
     private float maxDistance = 150f;
 
+    [SerializeField] Transform tip;
     [SerializeField] private NetworkObject bulletHolePrefab;
 
     float inaccuracyScalar = 0;
@@ -23,6 +24,8 @@ public class TRifle : WeaponBase
     readonly float maxHorizontalDeviation = 2f;
     readonly float recoilDecayRate = 0.5f;
     float movePenalty = 0.5f;
+    [SerializeField] float BulletSpeed = 200f;
+    [SerializeField] TrailRenderer BulletTrail;
 
 
     protected override void OnUpdate()
@@ -94,14 +97,16 @@ public class TRifle : WeaponBase
                 print("Tanc hit!");
             else if (hit.collider.gameObject.layer == (int)Layers.SolidGround || hit.collider.gameObject.layer == (int)Layers.Default)
                 SpawnBulletHoleRpc(hit.point);
-                    
-
-            if (hit.collider.GetComponent<HitboxScript>() != null)
-                hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
 
 
-            //LineRenderer lr = gameObject.AddComponent<LineRenderer>();
-            //lr.SetPositions(new Vector3[] {AttachedTanc.VerticalRotator.position, hit.point});
+            TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity);
+            StartCoroutine(SpawnTrail(trail, hit.point, hit.normal, true));
+        }
+        // do animation even if it doesn't hit anything
+        else
+        {
+            TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity);
+            StartCoroutine(SpawnTrail(trail, recoilPointer.transform.forward, Vector3.zero, false));
         }
 
         // increase inaccuracy (cap at 1)
@@ -128,5 +133,28 @@ public class TRifle : WeaponBase
         base.OnAttachedTancNetObjIDChanged(prev, curr);
 
         recoilPointer = AttachedTanc.RecoilPointer;
+    }
+
+    // trail logic adapted from: https://github.com/llamacademy/raycast-bullet-trails/blob/main/Assets/Scripts/Gun.cs
+    private IEnumerator SpawnTrail(TrailRenderer Trail, Vector3 HitPoint, Vector3 HitNormal, bool MadeImpact)
+    {
+        // This has been updated from the video implementation to fix a commonly raised issue about the bullet trails
+        // moving slowly when hitting something close, and not
+        Vector3 startPosition = Trail.transform.position;
+        float distance = Vector3.Distance(Trail.transform.position, HitPoint);
+        float remainingDistance = distance;
+
+        while (remainingDistance > 0)
+        {
+            print(remainingDistance);
+            Trail.transform.position = Vector3.Lerp(startPosition, HitPoint, 1 - (remainingDistance / distance));
+
+            remainingDistance -= BulletSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+        Trail.transform.position = HitPoint;
+
+        Destroy(Trail.gameObject, Trail.time);
     }
 }
