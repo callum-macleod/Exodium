@@ -7,6 +7,11 @@ public class TRifle : WeaponBase
 {
     private float fireDelay;
 
+    private int ammo;
+    private int ammoMax = 30;
+    private float reloadTime = 1.5f;
+    private float reloadStartTime;
+
     public override float MaxVelocity { get; } = 7f;
     protected override int baseDamage { get; set; } = 44;
     protected override float critMultiplier { get; set; } = 3f;
@@ -27,6 +32,10 @@ public class TRifle : WeaponBase
     [SerializeField] float BulletSpeed = 200f;
     [SerializeField] TrailRenderer BulletTrail;
 
+    private void Start()
+    {
+        ammo = ammoMax;
+    }
 
     protected override void OnUpdate()
     {
@@ -64,13 +73,26 @@ public class TRifle : WeaponBase
                 currHor * inaccuracyScalar,
                 0);
         }
+
+        // Manage Reload
+        if (Time.time >= reloadStartTime + reloadTime && ammo <= 0)
+        {
+            ammo = ammoMax;
+        }
     }
 
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
+        if (ammo <= 0) return;
+
         fireDelay = 0.11f;
+        ammo--;
+
+        if (ammo <= 0)
+            reloadStartTime = Time.time;
+
         SpawnShootSoundFxRpc();
 
         // calculate base inaccuracy
