@@ -25,7 +25,9 @@ public class Tanc : NetworkBehaviour
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 25; // force multiplier to deceleration force
     int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
-    float jumpForce = 7.5f; // force of the jump
+    [SerializeField] float jumpForce = 7.5f; // force of the jump
+    [SerializeField] float downwardGravity = 1f;
+    [SerializeField] float upwardGravity = 0.7f;
     public Vector3 Move { get; private set; }
     bool inAir = true;
 
@@ -175,7 +177,8 @@ public class Tanc : NetworkBehaviour
 
 
         // Add downward force in addition to existing gravity when jumping (more when falling).
-        float x = (rigidBody.velocity.y <= 0) ? 1 : 0.7f;
+        float x = (rigidBody.velocity.y <= 0) ? downwardGravity : upwardGravity;
+        //float x = (rigidBody.velocity.y <= 0) ? 1 : 0.7f;
         rigidBody.AddForce(Physics.gravity * x, ForceMode.Acceleration);
 
         GroundCheck(groundCheckRayRadius, groundCheckRayRange);

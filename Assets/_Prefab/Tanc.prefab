@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3884698604
+  GlobalObjectIdHash: 4080243202
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -294,9 +294,12 @@ MonoBehaviour:
   VerticalRotator: {fileID: 4587819814955486716}
   WeaponSpace: {fileID: 3899069240831065462}
   GroundChecker: {fileID: 5456907068024958997}
+  jumpForce: 8.5
+  downwardGravity: 1
+  upwardGravity: 1
   weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
   nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
-  slerpStrength: 0.13
+  slerpStrength: 0.2
   airResistanceMult: 0.15
   kTDashDuration: 0.15
   kTDashVelocity: 40
