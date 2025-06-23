@@ -146,7 +146,6 @@ public class TRifle : WeaponBase
 
         while (remainingDistance > 0)
         {
-            print(remainingDistance);
             Trail.transform.position = Vector3.Lerp(startPosition, HitPoint, 1 - (remainingDistance / distance));
 
             remainingDistance -= BulletSpeed * Time.deltaTime;

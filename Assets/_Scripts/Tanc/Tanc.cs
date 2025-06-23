@@ -64,6 +64,9 @@ public class Tanc : NetworkBehaviour
 
     private float skt8JumpCancelScalar = 0.6f;
 
+    [SerializeField] Transform LLeg;
+    [SerializeField] Transform RLeg;
+
 
     public GameObject RecoilPointer;
 
@@ -150,6 +153,11 @@ public class Tanc : NetworkBehaviour
             else
                 CancelKTSkate();
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+            ToggleCrouchRpc(true);
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+            ToggleCrouchRpc(false);
     }
 
     private void FixedUpdate()
@@ -405,6 +413,29 @@ public class Tanc : NetworkBehaviour
         droppedWeapon.GetComponent<ParentConstraint>().constraintActive = false;
     }
 
+    [Rpc(SendTo.Server)]
+    private void ToggleCrouchRpc(bool crouch)
+    {
+        float legN = (crouch) ? 0.5f : 0;
+        float colliderN = (crouch) ? -0.5f : 0.5f;
+
+        // make legs smaller
+        LLeg.localScale = new Vector3(1, 1 - legN, 1);
+        RLeg.localScale = new Vector3(1, 1 - legN, 1);
+
+        // move legs upwards
+        LLeg.localPosition = new Vector3(0, legN, 0);
+        RLeg.localPosition = new Vector3(0, legN, 0);
+
+        // make tanc collider shorter
+        GetComponent<CapsuleCollider>().height = 3.1f + colliderN;
+        GroundChecker.transform.position = GroundChecker.transform.position - Vector3.up * colliderN;
+        if (!inAir)
+        {
+            transform.position = transform.position + Vector3.up * colliderN;
+            //GroundChecker.transform.position = Vector3.up * 2f;
+        }
+    }
 
 
     [Rpc(SendTo.Server)]

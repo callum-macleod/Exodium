@@ -304,6 +304,8 @@ MonoBehaviour:
   kTSkateDuration: 4
   currentKTSkateDuration: 0
   sKT8Indicator: {fileID: 0}
+  LLeg: {fileID: 7837191603901225052}
+  RLeg: {fileID: 8182666052473335980}
   RecoilPointer: {fileID: 6406331851894003623}
 --- !u!114 &5121455351405466758
 MonoBehaviour:
@@ -986,6 +988,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: b1076ce9f2aa48f48a1c5fa0d3e03596, type: 2}
+    - target: {fileID: -6248826377294122618, guid: b411ae604d25db0479d626f0590d9214, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6248826377294122618, guid: b411ae604d25db0479d626f0590d9214, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -4157524182732408741, guid: b411ae604d25db0479d626f0590d9214, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1110,3 +1120,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthManager: {fileID: 691100717744974590}
   multiplier: 1
+--- !u!4 &7837191603901225052 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6248826377294122618, guid: b411ae604d25db0479d626f0590d9214, type: 3}
+  m_PrefabInstance: {fileID: 5009403262491568602}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8182666052473335980 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5473471334679045770, guid: b411ae604d25db0479d626f0590d9214, type: 3}
+  m_PrefabInstance: {fileID: 5009403262491568602}
+  m_PrefabAsset: {fileID: 0}
