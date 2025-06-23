@@ -174,9 +174,8 @@ GameObject:
   - component: {fileID: 5121455351405466758}
   - component: {fileID: 8129290164739404589}
   - component: {fileID: 691100717744974590}
-  m_Layer: 6
   - component: {fileID: 8781877411033705979}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tanc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -359,6 +358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectsToDisable:
   - {fileID: 1413396710222959962}
+  - {fileID: 8893777112875120215}
 --- !u!114 &691100717744974590
 MonoBehaviour:
   m_ObjectHideFlags: 0
