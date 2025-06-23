@@ -7,6 +7,7 @@ using UnityEngine.Animations;
 public class TRifle : WeaponBase
 {
     private float fireDelay;
+    [SerializeField] protected float fireDelayMax = 0.11f;
 
     private int ammo;
     public int Ammo { get { return ammo; } private set { ammo = value; } }
@@ -69,7 +70,7 @@ public class TRifle : WeaponBase
             fireDelay -= Time.deltaTime;
 
             if (Input.GetKey(KeyCode.Mouse0))
-                Shoot();
+                ShootCheck();
 
             if (inaccuracyScalar != 0)  // update weaponspace to match the recoil angle
                 AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(
@@ -112,13 +113,19 @@ public class TRifle : WeaponBase
         reloadStartTime = Time.time;
     }
 
+    // Override this on semi auto weapon, redundant on full auto weapons
+    protected virtual void ShootCheck()
+    {
+        Shoot();
+    }
+
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
         if (ammo <= 0 || ReloadStarted) return;
 
-        fireDelay = 0.11f;
+        fireDelay = fireDelayMax;
         ammo--;
 
         if (ammo <= 0)

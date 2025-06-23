@@ -16,7 +16,7 @@ public class Tanc : NetworkBehaviour
     [SerializeField] Transform HorizontalRotator;
     [SerializeField] public Transform VerticalRotator;
     [SerializeField] public Transform WeaponSpace;
-    [SerializeField] public Transform WeaponSlot1;
+    [SerializeField] public Transform[] weaponSlots;
 
 
     [SerializeField] Transform GroundChecker;
@@ -393,7 +393,8 @@ public class Tanc : NetworkBehaviour
         if (IsOwner)
         {
             ParentConstraint pc = weapons[slot].GetComponent<ParentConstraint>();
-            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = WeaponSlot1, weight = 1 } };
+            
+            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = weaponSlots[(int)slot], weight = 1 } };
             pc.SetSources(constraints);
             pc.constraintActive = true;
         }

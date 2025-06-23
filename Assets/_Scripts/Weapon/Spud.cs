@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spud : WeaponBase
+public class Spud : TRifle
 {
     public override float MaxVelocity { get; } = 8;
     public override WeaponSlot WeaponSlot { get; } = WeaponSlot.Secondary;
@@ -10,8 +10,11 @@ public class Spud : WeaponBase
     protected override float critMultiplier { get; set; } = 3f;
     protected override float limbMultiplier { get; set; } = 0.8f;
 
-    public override void Shoot()
+    protected override void ShootCheck()
     {
-        print($"{name}: Shooting");
+        if (!Input.GetKeyDown(KeyCode.Mouse0))
+            return;
+
+        base.ShootCheck();
     }
 }

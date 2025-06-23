@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4591427290271229247
 Transform:
   m_ObjectHideFlags: 0
@@ -295,7 +295,10 @@ MonoBehaviour:
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
   WeaponSpace: {fileID: 3899069240831065462}
-  WeaponSlot1: {fileID: 7639535787658608474}
+  weaponSlots:
+  - {fileID: 7639535787658608474}
+  - {fileID: 8974660650966727049}
+  - {fileID: 4591427290271229247}
   GroundChecker: {fileID: 5456907068024958997}
   jumpForce: 8.5
   downwardGravity: 1
@@ -435,7 +438,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8974660650966727049
 Transform:
   m_ObjectHideFlags: 0
