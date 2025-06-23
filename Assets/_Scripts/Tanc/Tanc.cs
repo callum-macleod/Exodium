@@ -16,6 +16,8 @@ public class Tanc : NetworkBehaviour
     [SerializeField] Transform HorizontalRotator;
     [SerializeField] public Transform VerticalRotator;
     [SerializeField] public Transform WeaponSpace;
+    [SerializeField] public Transform WeaponSlot1;
+
 
     [SerializeField] Transform GroundChecker;
     float groundCheckRayRadius = 0.3f;
@@ -333,6 +335,9 @@ public class Tanc : NetworkBehaviour
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
 
+        if (IsOwner && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
+            GetComponent<AmmoDisplayMgr>().gun = weapons[equippedWeaponSlot].GetComponent<TRifle>();
+
         print($"{{ERPC}} NOID: {NetworkObjectId} => equipping {slot}");
     }
 
@@ -388,7 +393,7 @@ public class Tanc : NetworkBehaviour
         if (IsOwner)
         {
             ParentConstraint pc = weapons[slot].GetComponent<ParentConstraint>();
-            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = WeaponSpace, weight = 1 } };
+            List<ConstraintSource> constraints = new List<ConstraintSource>() { new ConstraintSource { sourceTransform = WeaponSlot1, weight = 1 } };
             pc.SetSources(constraints);
             pc.constraintActive = true;
         }

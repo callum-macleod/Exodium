@@ -1,14 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class TRifle : WeaponBase
 {
     private float fireDelay;
 
     private int ammo;
+    public int Ammo { get { return ammo; } private set { ammo = value; } }
+
     private int ammoMax = 30;
+    public int AmmoMax { get { return ammoMax; } private set { ammoMax = value; } }
+
+    private bool ReloadStarted { get { return (Time.time < reloadStartTime + reloadTime); } }
+    private bool ReloadDone;
+
     private float reloadTime = 1.5f;
     private float reloadStartTime;
 
@@ -41,6 +50,18 @@ public class TRifle : WeaponBase
     {
         if (!IsOwner)
             return;
+
+        if (Time.time < reloadStartTime + reloadTime - 0.3f && !ReloadDone)
+        {
+            print((Time.time - reloadStartTime) / reloadTime);
+
+            Transform sourceTransform = GetComponent<ParentConstraint>().GetSource(0).sourceTransform;
+
+            sourceTransform.Rotate(Mathf.Lerp(0, 720, Time.deltaTime / (reloadTime - 0.3f)), 0, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+            ReloadStart();
 
         if (AttachedTanc != null)
         {
@@ -75,24 +96,32 @@ public class TRifle : WeaponBase
                 0);
         }
 
-        // Manage Reload
-        if (Time.time >= reloadStartTime + reloadTime && ammo <= 0)
+        // Check For Reload Finish
+        if (!ReloadStarted && !ReloadDone)
         {
+            GetComponent<ParentConstraint>().GetSource(0).sourceTransform.localRotation = Quaternion.identity;
             ammo = ammoMax;
+            ReloadDone = true;
         }
+    }
+
+    private void ReloadStart()
+    {
+        ReloadDone = false;
+        reloadStartTime = Time.time;
     }
 
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
-        if (ammo <= 0) return;
+        if (ammo <= 0 || ReloadStarted) return;
 
         fireDelay = 0.11f;
         ammo--;
 
         if (ammo <= 0)
-            reloadStartTime = Time.time;
+            ReloadStart();
 
         SpawnShootSoundFxRpc();
 
