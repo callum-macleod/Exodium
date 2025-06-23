@@ -43,6 +43,8 @@ public class TRifle : WeaponBase
     private void Start()
     {
         ammo = ammoMax;
+
+        ReloadDone = true;
     }
 
     protected override void OnUpdate()
