@@ -327,6 +327,8 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
 
+        weapons[equippedWeaponSlot].GetComponent<TRifle>().ResetInaccuracyToZero();
+
         // unequip current weapon
         if (weapons.TryGetValue(equippedWeaponSlot, out fuckoff))
             weapons[equippedWeaponSlot].SetActive(false);
@@ -334,6 +336,7 @@ public class Tanc : NetworkBehaviour
         // equip new weapon
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
+        WeaponSpace.localRotation = Quaternion.identity;
 
         if (IsOwner && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
             GetComponent<AmmoDisplayMgr>().gun = weapons[equippedWeaponSlot].GetComponent<TRifle>();

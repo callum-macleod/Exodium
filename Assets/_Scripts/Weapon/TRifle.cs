@@ -55,7 +55,7 @@ public class TRifle : WeaponBase
 
         if (Time.time < reloadStartTime + reloadTime - 0.3f && !ReloadDone)
         {
-            print((Time.time - reloadStartTime) / reloadTime);
+            //print((Time.time - reloadStartTime) / reloadTime);
 
             Transform sourceTransform = GetComponent<ParentConstraint>().GetSource(0).sourceTransform;
 
@@ -72,7 +72,7 @@ public class TRifle : WeaponBase
             if (Input.GetKey(KeyCode.Mouse0))
                 ShootCheck();
 
-            if (inaccuracyScalar != 0)  // update weaponspace to match the recoil angle
+            if (inaccuracyScalar > 0)  // update weaponspace to match the recoil angle
                 AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(
                     recoilPointer.transform.localRotation.eulerAngles.x,
                     recoilPointer.transform.localRotation.eulerAngles.y,
@@ -177,13 +177,6 @@ public class TRifle : WeaponBase
         Instantiate(ShootSfx, transform.position, transform.rotation);
     }
 
-    //[Rpc(SendTo.Server)]
-    //private void SpawnBulletHoleRpc(Vector3 pos)
-    //{
-    //    NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
-    //    bh.transform.position = pos;
-    //}
-
 
     protected override void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
@@ -198,18 +191,11 @@ public class TRifle : WeaponBase
     private void SpawnBulletVisualsRpc(Vector3 hitPoint, bool spawnHole = false)
     {
         // spawn trail
-        //TrailRenderer trail = NetworkManager.SpawnManager.InstantiateAndSpawn(BulletTrail).GetComponent<TrailRenderer>();
-        //trail.transform.position = tip.position;
         TrailRenderer trail = Instantiate(BulletTrail, tip.position, Quaternion.identity).GetComponent<TrailRenderer>();
         StartCoroutine(SpawnTrail(trail, hitPoint));
 
         // spawn hole
-        if (spawnHole)
-        {
-            Instantiate(bulletHolePrefab, hitPoint, Quaternion.identity);
-            //NetworkObject bh = NetworkManager.SpawnManager.InstantiateAndSpawn(bulletHolePrefab);
-            //bh.transform.position = hitPoint;
-        }
+        if (spawnHole) Instantiate(bulletHolePrefab, hitPoint, Quaternion.identity);
     }
 
     // trail logic adapted from: https://github.com/llamacademy/raycast-bullet-trails/blob/main/Assets/Scripts/Gun.cs
@@ -232,5 +218,10 @@ public class TRifle : WeaponBase
         Trail.transform.position = HitPoint;
 
         Destroy(Trail.gameObject, Trail.time);
+    }
+
+    public void ResetInaccuracyToZero()
+    {
+        inaccuracyScalar = 0f;
     }
 }
