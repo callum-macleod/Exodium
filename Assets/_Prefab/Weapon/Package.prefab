@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fd0eb6a6c93a6c9468d4c717730d349b, type: 2}
+  - {fileID: 2100000, guid: 6e1d3f9722c43524eb6868de59d1b760, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -227,4 +227,5 @@ MonoBehaviour:
   weaponID: 3
   ShootSfx: {fileID: 0}
   AttachedTanc: {fileID: 0}
-  explosionMultiplier: 20
+  detonationDuration: 3
+  explosionMultiplier: 30

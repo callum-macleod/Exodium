@@ -24,7 +24,7 @@ public class Package : WeaponBase
     float timeOfPlantCompleted;
 
     bool detonating = false;
-    float detonationDuration = 2f;
+    [SerializeField] float detonationDuration = 2f;
     float timeOfDetonation;
 
     [SerializeField] float explosionMultiplier;
@@ -80,7 +80,7 @@ public class Package : WeaponBase
 
     private void WhileDetonating()
     {
-        if (timeOfDetonation + detonationTimer >= Time.time)
+        if (timeOfDetonation + detonationDuration >= Time.time)
             transform.localScale = Vector3.one * (1 + Time.time - timeOfDetonation) * explosionMultiplier;
     }
 }
