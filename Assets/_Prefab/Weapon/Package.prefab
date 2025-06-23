@@ -227,3 +227,4 @@ MonoBehaviour:
   weaponID: 3
   ShootSfx: {fileID: 0}
   AttachedTanc: {fileID: 0}
+  explosionMultiplier: 20

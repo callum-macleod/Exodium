@@ -173,11 +173,13 @@ public class Tanc : NetworkBehaviour
             ToggleCrouchRpc(false);
 
         // spawn Package (testing
-        if (Input.GetKeyDown(KeyCode.CapsLock))
-        {
-            NetworkObject p = NetworkManager.SpawnManager.InstantiateAndSpawn(Package);
-            p.transform.position = Vector3.up * 3f;
-        }
+        if (Input.GetKeyDown(KeyCode.CapsLock)) SpawnPackageRpc();
+    }
+    [Rpc(SendTo.Server)]
+    private void SpawnPackageRpc()
+    {
+        NetworkObject p = NetworkManager.SpawnManager.InstantiateAndSpawn(Package);
+        p.transform.position = Vector3.up * 3f;
     }
 
     private void FixedUpdate()
@@ -327,7 +329,8 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
 
-        weapons[equippedWeaponSlot].GetComponent<TRifle>()?.ResetInaccuracyToZero();
+        if (weapons.TryGetValue(equippedWeaponSlot, out GameObject weapon) && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
+            weapon.GetComponent<TRifle>().ResetInaccuracyToZero();
 
         // unequip current weapon
         if (weapons.TryGetValue(equippedWeaponSlot, out fuckoff))

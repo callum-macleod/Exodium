@@ -65,6 +65,7 @@ public abstract class WeaponBase : NetworkBehaviour
 
         if (_collider != null) _collider.enabled = curr;
         if (_rigidbody != null) _rigidbody.isKinematic = !curr;
+        print("balllssss");
     }
 
 
