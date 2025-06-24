@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AmmoMgr : MonoBehaviour
 {
-    [SerializeField] public int ammo;
+    [NonSerialized] public int ammo;
     [SerializeField] private int ammoMax; 
     [SerializeField] private float reloadTime; 
     public float reloadStartTime { get; private set; }

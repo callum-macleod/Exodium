@@ -37,17 +37,14 @@ public class TRifle : WeaponBase
         if (!IsOwner)
             return;
 
+        // if reloading: do rotating animation
         if (Time.time < ammoMgr.GetReloadEndTime() - 0.3f && !ammoMgr.GetReloadDone())
         {
-            //print((Time.time - reloadStartTime) / reloadTime);
-
             Transform sourceTransform = GetComponent<ParentConstraint>().GetSource(0).sourceTransform;
-
             sourceTransform.Rotate(Mathf.Lerp(0, 720, Time.deltaTime / (ammoMgr.GetReloadTime() - 0.3f)), 0, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-            ReloadStart();
+        if (Input.GetKeyDown(KeyCode.R)) ammoMgr.ReloadStarted();
 
         if (AttachedTanc != null)
         {
@@ -83,35 +80,27 @@ public class TRifle : WeaponBase
         }
 
         // Check For Reload Finish
-        if (!ammoMgr.GetReloadStarted() && !ammoMgr.GetReloadDone())
+        if (!ammoMgr.ReloadStarted() && !ammoMgr.GetReloadDone())
         {
             GetComponent<ParentConstraint>().GetSource(0).sourceTransform.localRotation = Quaternion.identity;
             ammoMgr.ResetAmmo();
         }
     }
 
-    private void ReloadStart()
-    {
-        ammoMgr.ReloadStartNow();
-    }
 
     // Override this on semi auto weapon, redundant on full auto weapons
-    protected virtual void ShootCheck()
-    {
-        Shoot();
-    }
+    protected virtual void ShootCheck() => Shoot();
 
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
-        if (ammoMgr.IsOutOfAmmo() || ammoMgr.GetReloadStarted()) return;
+        if (ammoMgr.IsOutOfAmmo() || ammoMgr.ReloadStarted()) return;
 
         fireDelay = fireDelayMax;
         ammoMgr.ReduceAmmoOnce();
 
-        if (ammoMgr.IsOutOfAmmo())
-            ReloadStart();
+        if (ammoMgr.IsOutOfAmmo()) ammoMgr.ReloadStarted();
 
         SpawnShootSoundFxRpc();
 
