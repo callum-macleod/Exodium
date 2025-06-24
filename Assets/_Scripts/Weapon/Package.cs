@@ -81,6 +81,6 @@ public class Package : WeaponBase
     private void WhileDetonating()
     {
         if (timeOfDetonation + detonationDuration >= Time.time)
-            transform.localScale = Vector3.one * (1 + Time.time - timeOfDetonation) * explosionMultiplier;
+            transform.localScale = Vector3.one * (Time.time - timeOfDetonation) * explosionMultiplier;
     }
 }

@@ -176,6 +176,7 @@ GameObject:
   - component: {fileID: 8129290164739404589}
   - component: {fileID: 691100717744974590}
   - component: {fileID: 8781877411033705979}
+  - component: {fileID: 5887813900750126503}
   m_Layer: 6
   m_Name: Tanc
   m_TagString: Untagged
@@ -395,6 +396,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: {fileID: 1607076728079070404}
   gun: {fileID: 0}
+--- !u!114 &5887813900750126503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140893562268515772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2959098203030375826
 GameObject:
   m_ObjectHideFlags: 0
