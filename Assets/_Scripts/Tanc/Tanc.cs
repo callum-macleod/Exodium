@@ -421,7 +421,7 @@ public class Tanc : NetworkBehaviour
     public void DropWeapon(WeaponSlot slot)
     {
         // if no weapon in slot: do nothing
-        if (!weapons.TryGetValue(slot, out GameObject fuckoff))
+        if (!weapons.TryGetValue(slot, out GameObject w) || !w.activeSelf)
             return;
 
         print($"{{ERPC}} NOID: {NetworkObjectId} => dropping {slot}");

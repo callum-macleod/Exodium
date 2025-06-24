@@ -12,6 +12,6 @@ public class AmmoDisplayMgr : MonoBehaviour
     private void FixedUpdate()
     {
         if (gun != null)
-            displayText.text = gun.Ammo + "/" + gun.AmmoMax;
+            displayText.text = gun.ammoMgr.ammo + "/" + gun.ammoMgr.GetAmmoMax();
     }
 }

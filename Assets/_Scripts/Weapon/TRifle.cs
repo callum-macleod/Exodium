@@ -6,21 +6,6 @@ using UnityEngine.Animations;
 
 public class TRifle : WeaponBase
 {
-    private float fireDelay;
-    [SerializeField] protected float fireDelayMax = 0.11f;
-
-    private int ammo;
-    public int Ammo { get { return ammo; } private set { ammo = value; } }
-
-    private int ammoMax = 30;
-    public int AmmoMax { get { return ammoMax; } private set { ammoMax = value; } }
-
-    private bool ReloadStarted { get { return (Time.time < reloadStartTime + reloadTime); } }
-    private bool ReloadDone;
-
-    private float reloadTime = 1.5f;
-    private float reloadStartTime;
-
     public override float MaxVelocity { get; } = 7f;
     protected override int baseDamage { get; set; } = 44;
     protected override float critMultiplier { get; set; } = 3f;
@@ -40,12 +25,11 @@ public class TRifle : WeaponBase
     float movePenalty = 0.5f;
     [SerializeField] float BulletSpeed = 200f;
     [SerializeField] GameObject BulletTrail;
+    public AmmoMgr ammoMgr;
 
     private void Start()
     {
-        ammo = ammoMax;
-
-        ReloadDone = true;
+        ammoMgr.ResetAmmo();
     }
 
     protected override void OnUpdate()
@@ -53,17 +37,14 @@ public class TRifle : WeaponBase
         if (!IsOwner)
             return;
 
-        if (Time.time < reloadStartTime + reloadTime - 0.3f && !ReloadDone)
+        // if reloading: do rotating animation
+        if (Time.time < ammoMgr.GetReloadEndTime() - 0.3f && !ammoMgr.GetReloadDone())
         {
-            //print((Time.time - reloadStartTime) / reloadTime);
-
             Transform sourceTransform = GetComponent<ParentConstraint>().GetSource(0).sourceTransform;
-
-            sourceTransform.Rotate(Mathf.Lerp(0, 720, Time.deltaTime / (reloadTime - 0.3f)), 0, 0);
+            sourceTransform.Rotate(Mathf.Lerp(0, 720, Time.deltaTime / (ammoMgr.GetReloadTime() - 0.3f)), 0, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-            ReloadStart();
+        if (Input.GetKeyDown(KeyCode.R)) ammoMgr.ReloadStarted();
 
         if (AttachedTanc != null)
         {
@@ -81,7 +62,7 @@ public class TRifle : WeaponBase
 
         // recover from recoil over time (decay)
         // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
-        if (inaccuracyScalar > 0 && (!Input.GetKey(KeyCode.Mouse0) || reloadStartTime + reloadTime > Time.time))
+        if (inaccuracyScalar > 0 && (!Input.GetKey(KeyCode.Mouse0) || ammoMgr.GetReloadEndTime() > Time.time))
         {
             float multiplier = (inaccuracyScalar > 0.5f) ? 2f : 1f;
             inaccuracyScalar -= recoilDecayRate * Time.deltaTime * multiplier;  // this maybe should not be done in update / with Time.deltaTime
@@ -99,37 +80,27 @@ public class TRifle : WeaponBase
         }
 
         // Check For Reload Finish
-        if (!ReloadStarted && !ReloadDone)
+        if (!ammoMgr.ReloadStarted() && !ammoMgr.GetReloadDone())
         {
             GetComponent<ParentConstraint>().GetSource(0).sourceTransform.localRotation = Quaternion.identity;
-            ammo = ammoMax;
-            ReloadDone = true;
+            ammoMgr.ResetAmmo();
         }
     }
 
-    private void ReloadStart()
-    {
-        ReloadDone = false;
-        reloadStartTime = Time.time;
-    }
 
     // Override this on semi auto weapon, redundant on full auto weapons
-    protected virtual void ShootCheck()
-    {
-        Shoot();
-    }
+    protected virtual void ShootCheck() => Shoot();
 
     public override void Shoot()
     {
         if (fireDelay > 0) return;
 
-        if (ammo <= 0 || ReloadStarted) return;
+        if (ammoMgr.IsOutOfAmmo() || ammoMgr.ReloadStarted()) return;
 
         fireDelay = fireDelayMax;
-        ammo--;
+        ammoMgr.ReduceAmmoOnce();
 
-        if (ammo <= 0)
-            ReloadStart();
+        if (ammoMgr.IsOutOfAmmo()) ammoMgr.ReloadStarted();
 
         SpawnShootSoundFxRpc();
 
