@@ -34,7 +34,7 @@ public abstract class WeaponBase : NetworkBehaviour
         {
             // handles case where prev value matches the new value
             // (e.g. when default value matches new value)
-            if (IsDetached.Value == val) ToggleColliderAndRigidbody(val);
+            if (IsDetached.Value == val) ToggleColliderAndRigidbodyRpc(val);
 
             IsDetached.Value = val;
         }
@@ -72,6 +72,9 @@ public abstract class WeaponBase : NetworkBehaviour
 
         ToggleColliderAndRigidbody(curr);
     }
+
+    [Rpc(SendTo.Everyone)]
+    private void ToggleColliderAndRigidbodyRpc(bool isDetached) => ToggleColliderAndRigidbody(isDetached);
 
     private void ToggleColliderAndRigidbody(bool isDetached)
     {

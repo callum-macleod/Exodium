@@ -133,10 +133,13 @@ public class Tanc : NetworkBehaviour
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
         {
+            // raycast to try hit a weapon
             if (Physics.SphereCast(VerticalRotator.position, 1f, VerticalRotator.forward, out RaycastHit hit, pickupRange, Utils.LayerToLayerMask(Layers.Weapon)))
             {
+                // if the weapon has a gameobject and WeaponBase
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
+                    // if the weapon is not the planted package
                     if (!(hit.collider.gameObject.TryGetComponent<Package>(out Package package) && package.Planted))
                     {
                         PickupWeaponRpc(
