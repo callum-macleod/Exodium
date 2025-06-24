@@ -20,7 +20,7 @@ public class Package : WeaponBase
     bool planting = false;
 
     float detonationTimer = 5f;
-    bool planted = false;
+    public bool Planted { get; private set; } = false;
     float timeOfPlantCompleted;
 
     bool detonating = false;
@@ -33,11 +33,11 @@ public class Package : WeaponBase
     {
         if (!IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && !planted) Shoot();
+        if (Input.GetKeyDown(KeyCode.Mouse0) && !Planted) Shoot();
 
         else if (planting) Planting();
 
-        else if (planted) WhilePlanted();
+        else if (Planted) WhilePlanted();
 
         else if (detonating) WhileDetonating();
     }
@@ -61,7 +61,7 @@ public class Package : WeaponBase
     {
         print("planted");
         planting = false;
-        planted = true;
+        Planted = true;
         timeOfPlantCompleted = Time.time;
         AttachedTanc.DropWeaponRpc(WeaponSlot);
     }
@@ -75,7 +75,7 @@ public class Package : WeaponBase
     {
         timeOfDetonation = Time.time;
         detonating = true;
-        planted = false;
+        Planted = false;
     }
 
     private void WhileDetonating()

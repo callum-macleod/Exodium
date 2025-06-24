@@ -137,10 +137,13 @@ public class Tanc : NetworkBehaviour
             {
                 if (hit.collider.gameObject != null && hit.collider.gameObject.GetComponent<WeaponBase>() != null)
                 {
-                    PickupWeaponRpc(
-                        hit.collider.gameObject.GetComponent<WeaponBase>().weaponID,
-                        hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot,
-                        hit.collider.GetComponent<NetworkObject>());
+                    if (!(hit.collider.gameObject.TryGetComponent<Package>(out Package package) && package.Planted))
+                    {
+                        PickupWeaponRpc(
+                            hit.collider.gameObject.GetComponent<WeaponBase>().weaponID,
+                            hit.collider.gameObject.GetComponent<WeaponBase>().WeaponSlot,
+                            hit.collider.GetComponent<NetworkObject>());
+                    }
                 }
             }
         }

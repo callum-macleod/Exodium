@@ -30,7 +30,14 @@ public abstract class WeaponBase : NetworkBehaviour
 
     public void SetIsDetachedIfOwner(bool val)
     {
-        if (IsOwner) IsDetached.Value = val;
+        if (IsOwner)
+        {
+            // handles case where prev value matches the new value
+            // (e.g. when default value matches new value)
+            if (IsDetached.Value == val) ToggleColliderAndRigidbody(val);
+
+            IsDetached.Value = val;
+        }
     }
 
 
@@ -63,9 +70,13 @@ public abstract class WeaponBase : NetworkBehaviour
         // if detaching: reset attached tanc
         if (curr) AttachedTanc = null;
 
-        if (_collider != null) _collider.enabled = curr;
-        if (_rigidbody != null) _rigidbody.isKinematic = !curr;
-        print("balllssss");
+        ToggleColliderAndRigidbody(curr);
+    }
+
+    private void ToggleColliderAndRigidbody(bool isDetached)
+    {
+        if (_collider != null) _collider.enabled = isDetached;
+        if (_rigidbody != null) _rigidbody.isKinematic = !isDetached;
     }
 
 
