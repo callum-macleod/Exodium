@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class AmmoMgr : MonoBehaviour
 {
-    public int ammo {  get; private set; }
-    [SerializeField] private int ammoMax; public float GetAmmoMax() { return ammoMax; }
-
-    [SerializeField] private float reloadTime; public float GetReloadTime() { return reloadTime; }
+    [SerializeField] public int ammo;
+    [SerializeField] private int ammoMax; 
+    [SerializeField] private float reloadTime; 
     public float reloadStartTime { get; private set; }
+    private bool reloadDone; 
 
-
-    private bool ReloadStarted; public bool GetReloadStarted() { return (Time.time < GetReloadEndTime()); }
-    private bool ReloadDone; public bool GetReloadDone() { return ReloadDone; }
-
+    public float GetAmmoMax() { return ammoMax; }
+    public float GetReloadTime() { return reloadTime; }
+    public bool GetReloadDone() { return reloadDone; }
+    public bool ReloadStarted() { return (Time.time < GetReloadEndTime()); }
 
     public void ReloadStartNow()
     {
         reloadStartTime = Time.time;
-        ReloadDone = false;
+        reloadDone = false;
     }
 
     public float GetReloadEndTime()
@@ -29,14 +29,13 @@ public class AmmoMgr : MonoBehaviour
     public void ResetAmmo()
     {
         ammo = ammoMax;
-        ReloadDone = true;
+        reloadDone = true;
     }
 
     public void ReduceAmmoOnce()
     {
         ammo--;
     }
-
 
     public bool IsOutOfAmmo()
     {
