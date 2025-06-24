@@ -17,15 +17,11 @@ public class TRifle : WeaponBase
     [SerializeField] Transform tip;
     [SerializeField] private GameObject bulletHolePrefab;
 
-    float inaccuracyScalar = 0;
-    GameObject recoilPointer;
-    readonly float maxVerticalRecoil = -10;
-    readonly float maxHorizontalDeviation = 2f;
-    readonly float recoilDecayRate = 0.5f;
-    float movePenalty = 0.5f;
+
     [SerializeField] float BulletSpeed = 200f;
     [SerializeField] GameObject BulletTrail;
     public AmmoMgr ammoMgr;
+    public RecoilMgr recoilMgr;
 
     private void Start()
     {
@@ -44,7 +40,7 @@ public class TRifle : WeaponBase
             sourceTransform.Rotate(Mathf.Lerp(0, 720, Time.deltaTime / (ammoMgr.GetReloadTime() - 0.3f)), 0, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.R)) ammoMgr.ReloadStarted();
+        if (Input.GetKeyDown(KeyCode.R)) ammoMgr.ReloadStartNow();
 
         if (AttachedTanc != null)
         {
@@ -53,31 +49,12 @@ public class TRifle : WeaponBase
             if (Input.GetKey(KeyCode.Mouse0))
                 ShootCheck();
 
-            if (inaccuracyScalar > 0)  // update weaponspace to match the recoil angle
-                AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(
-                    recoilPointer.transform.localRotation.eulerAngles.x,
-                    recoilPointer.transform.localRotation.eulerAngles.y,
-                    0);
+            recoilMgr.UpdateWeaponSpace();
         }
 
         // recover from recoil over time (decay)
         // if you drop the weapon while it has recoil, we still want the recoil to go down to 0 before someone picks it up
-        if (inaccuracyScalar > 0 && (!Input.GetKey(KeyCode.Mouse0) || ammoMgr.GetReloadEndTime() > Time.time))
-        {
-            float multiplier = (inaccuracyScalar > 0.5f) ? 2f : 1f;
-            inaccuracyScalar -= recoilDecayRate * Time.deltaTime * multiplier;  // this maybe should not be done in update / with Time.deltaTime
-
-            // handles cases where the rotation is negative
-            // e.g. a rotation of -2 will actually be stored as 358. hence, we need to force it to be -2.
-            float currHor = recoilPointer.transform.localRotation.eulerAngles.y;
-            if (currHor > 180) currHor -= 360;
-
-            // reduce recoilPointer rotation
-            recoilPointer.transform.localRotation = Quaternion.Euler(
-                maxVerticalRecoil * inaccuracyScalar,
-                currHor * inaccuracyScalar,
-                0);
-        }
+        recoilMgr.DecayRecoil(ammoMgr);
 
         // Check For Reload Finish
         if (!ammoMgr.ReloadStarted() && !ammoMgr.GetReloadDone())
@@ -88,41 +65,28 @@ public class TRifle : WeaponBase
     }
 
 
-    // Override this on semi auto weapon, redundant on full auto weapons
-    protected virtual void ShootCheck() => Shoot();
+    // Override this on semi auto weapon
+    protected virtual void ShootCheck() 
+    {
+        if (fireDelay > 0) return;
+        if (ammoMgr.IsOutOfAmmo() || ammoMgr.ReloadStarted()) return;
+
+        Shoot();
+    }
 
     public override void Shoot()
     {
-        if (fireDelay > 0) return;
-
-        if (ammoMgr.IsOutOfAmmo() || ammoMgr.ReloadStarted()) return;
-
         fireDelay = fireDelayMax;
         ammoMgr.ReduceAmmoOnce();
 
-        if (ammoMgr.IsOutOfAmmo()) ammoMgr.ReloadStarted();
-
         SpawnShootSoundFxRpc();
 
-        // calculate base inaccuracy
-        float currentHorizontal = recoilPointer.transform.localRotation.eulerAngles.y;
-        float potentialDeviation = maxHorizontalDeviation * inaccuracyScalar;
-        float newHor = currentHorizontal + potentialDeviation * Random.Range(-1f, 1f);
+        recoilMgr.CalculateBaseInaccuracy();
 
-        recoilPointer.transform.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, newHor, 0);
-
-        // add movement penalty
-        float currentSpeed = AttachedTanc.GetComponent<Rigidbody>().velocity.magnitude;
-        float xPenalty = movePenalty * currentSpeed * Random.Range(-1f, 1f);
-        float yPenalty = movePenalty * currentSpeed * Random.Range(-1f, 1f);
-
-        recoilPointer.transform.localRotation = Quaternion.Euler(
-            recoilPointer.transform.localEulerAngles.x + xPenalty,
-            recoilPointer.transform.localEulerAngles.y + yPenalty,
-            recoilPointer.transform.localEulerAngles.z);
+        recoilMgr.AddMovementPenalty();
 
         // perform raycast
-        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
+        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilMgr.recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
         {
             if (hit.collider.gameObject.layer == (int)Layers.Tanc)
                 hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
@@ -134,12 +98,14 @@ public class TRifle : WeaponBase
         // do animation even if it doesn't hit anything
         else
         {
-            SpawnBulletVisualsRpc(recoilPointer.transform.position + recoilPointer.transform.forward * 100, false);
+            SpawnBulletVisualsRpc(recoilMgr.recoilPointer.transform.position + recoilMgr.recoilPointer.transform.forward * 100, false);
         }
 
-        // increase inaccuracy (cap at 1)
-        inaccuracyScalar += 0.05f;
-        if (inaccuracyScalar > 1) inaccuracyScalar = 1f;
+        recoilMgr.IncreaseInaccuracy();
+
+        // Check if I am now out of ammo, and if so: reload
+        if (ammoMgr.IsOutOfAmmo())
+            ammoMgr.ReloadStartNow();
     }
 
     [Rpc(SendTo.Everyone)]
@@ -153,7 +119,7 @@ public class TRifle : WeaponBase
     {
         base.OnAttachedTancNetObjIDChanged(prev, curr);
 
-        recoilPointer = AttachedTanc.RecoilPointer;
+        recoilMgr.recoilPointer = AttachedTanc.RecoilPointer;
     }
 
 
@@ -189,10 +155,5 @@ public class TRifle : WeaponBase
         Trail.transform.position = HitPoint;
 
         Destroy(Trail.gameObject, Trail.time);
-    }
-
-    public void ResetInaccuracyToZero()
-    {
-        inaccuracyScalar = 0f;
     }
 }

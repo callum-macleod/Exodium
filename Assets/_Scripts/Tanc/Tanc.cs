@@ -72,7 +72,7 @@ public class Tanc : NetworkBehaviour
     [SerializeField] Transform RLeg;
 
 
-    public GameObject RecoilPointer;
+    public Transform RecoilPointer;
 
     // for testing
     public NetworkObject Package;
@@ -335,8 +335,8 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject fuckoff))
             return;
 
-        if (weapons.TryGetValue(equippedWeaponSlot, out GameObject weapon) && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
-            weapon.GetComponent<TRifle>().ResetInaccuracyToZero();
+        if (weapons.TryGetValue(equippedWeaponSlot, out GameObject weapon) && weapons[equippedWeaponSlot].GetComponent<RecoilMgr>() != null)
+            weapon.GetComponent<RecoilMgr>().ResetInaccuracyToZero();
 
         // unequip current weapon
         if (weapons.TryGetValue(equippedWeaponSlot, out fuckoff))

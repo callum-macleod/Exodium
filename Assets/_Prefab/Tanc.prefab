@@ -273,7 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4080243202
+  GlobalObjectIdHash: 3884698604
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -318,7 +318,7 @@ MonoBehaviour:
   sKT8Indicator: {fileID: 0}
   LLeg: {fileID: 7837191603901225052}
   RLeg: {fileID: 8182666052473335980}
-  RecoilPointer: {fileID: 6406331851894003623}
+  RecoilPointer: {fileID: 1376576832689583636}
   Package: {fileID: 8177003038699762012, guid: 67b58d4e670b6c142bdbf7141a46460b, type: 3}
 --- !u!114 &5121455351405466758
 MonoBehaviour:
