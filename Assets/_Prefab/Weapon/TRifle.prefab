@@ -106,6 +106,9 @@ PrefabInstance:
       addedObject: {fileID: -1690045641167042408}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 440135933578876436}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8593088133392927745}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dfdd9c3f344ab14db34da47d64ab9e0, type: 3}
       insertIndex: -1
@@ -161,13 +164,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponID: 2
+  fireDelayMax: 0.11
   ShootSfx: {fileID: 8236992411107391694, guid: b89a73c21aa7f374da3d348eb120d63a, type: 3}
   AttachedTanc: {fileID: 0}
-  fireDelayMax: 0.11
   tip: {fileID: 2962481457900975431}
   bulletHolePrefab: {fileID: 3828570691383077520, guid: 0d09ac934d73b6749a44fed56d6f385f, type: 3}
   BulletSpeed: 300
   BulletTrail: {fileID: 4748658696004837488, guid: 2eb4446fb9fe67942b3df840022bdc10, type: 3}
+  ammoMgr: {fileID: 440135933578876436}
+--- !u!114 &440135933578876436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6410100500443113811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fed74e60ddee84abb1b059b74bae47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoMax: 30
+  reloadTime: 1.5
 --- !u!136 &8593088133392927745
 CapsuleCollider:
   m_ObjectHideFlags: 0

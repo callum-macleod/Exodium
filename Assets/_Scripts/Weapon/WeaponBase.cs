@@ -15,6 +15,9 @@ public abstract class WeaponBase : NetworkBehaviour
     public abstract WeaponSlot WeaponSlot { get; }
     public abstract float MaxVelocity { get; }
 
+    protected float fireDelay;
+    [SerializeField] protected float fireDelayMax = 0.11f;
+
 
     // behaviour while detached from a tanc (i.e. on the floor)
     [SerializeField] Rigidbody _rigidbody { get; set; }
