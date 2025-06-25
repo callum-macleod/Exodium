@@ -8,6 +8,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using JetBrains.Annotations;
 using UnityEngine.Animations;
+using TMPro;
 
 public class Tanc : NetworkBehaviour
 {
@@ -39,7 +40,6 @@ public class Tanc : NetworkBehaviour
 
     // detecting nearby weapons
     float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
-    float weaponPickupAngle = 1f - (50f / 90f);  // the angle within which you can pick up a weapon (i.e. how accurate you need to aim at it)
 
     [SerializeField] WeaponLookupSO weaponLookup;
 
@@ -77,6 +77,8 @@ public class Tanc : NetworkBehaviour
     // for testing
     public NetworkObject Package;
 
+    public TextMeshProUGUI RoundTimerUI;
+
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
@@ -87,7 +89,6 @@ public class Tanc : NetworkBehaviour
         if (!IsOwner) return;
 
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
-        sKT8Indicator = GameObject.FindGameObjectsWithTag("sKT8Indicator")[0];  // temporary mode of finding gameobject - should be improved
         sKT8Indicator.SetActive(false);
     }
 
@@ -102,14 +103,20 @@ public class Tanc : NetworkBehaviour
             currentKTSkateCD -= Time.deltaTime;
 
         // jump
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir && !kTDashing)
         {
             rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
-            if (kTDashing)
-            {
-                CancelKTDash(false);
-                rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
-            }
+            //if (kTDashing)
+            //{
+            //    CancelKTDash(false);
+            //    rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
+            //}
+        }
+        if (Input.GetKeyDown(KeyCode.Space) && kTDashing)
+        {
+            CancelKTDash(false);
+            rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
+            rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
         }
 
         // equip weapons

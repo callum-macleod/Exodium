@@ -15,14 +15,14 @@ public class ClientSideMgr : MonoBehaviour
     [NonSerialized] public bool ShopActive = false;
 
 
-    [SerializeField] GameObject myMenu;
-    [NonSerialized] public bool MyMenuActive = false;
+    [SerializeField] GameObject mainMenu;
+    [NonSerialized] public bool MainMenuActive = false;
 
     public bool IsMenuActive
     {
         get
         {
-            return (ShopActive || MyMenuActive);
+            return (ShopActive || MainMenuActive);
         }
     }
 
@@ -43,8 +43,8 @@ public class ClientSideMgr : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            MyMenuActive = !MyMenuActive;
-            myMenu.SetActive(MyMenuActive);
+            MainMenuActive = !MainMenuActive;
+            mainMenu.SetActive(MainMenuActive);
             UpdateCursorLock();
         }
     }
