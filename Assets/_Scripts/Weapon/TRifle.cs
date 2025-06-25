@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.UI;
 
 public class TRifle : WeaponBase
 {
@@ -85,13 +86,15 @@ public class TRifle : WeaponBase
 
         recoilMgr.AddMovementPenalty();
 
+        int layerMask = Utils.LayersToLayerMask(new Layers[] { Layers.Default, Layers.SolidGround, Layers.TancHitbox });
         // perform raycast
-        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilMgr.recoilPointer.transform.forward, out RaycastHit hit, maxDistance))
+        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilMgr.recoilPointer.transform.forward, out RaycastHit hit, maxDistance, layerMask))
         {
-            if (hit.collider.gameObject.layer == (int)Layers.Tanc)
-                hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
+            //if (hit.collider.gameObject.layer == (int)Layers.TancHitbox)
+            //    hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
+            if (hit.collider.gameObject.TryGetComponent<HitboxScript>(out HitboxScript hb))
+                hb.DealDamage(baseDamage);
 
-            //else if (hit.collider.gameObject.layer == (int)Layers.SolidGround || hit.collider.gameObject.layer == (int)Layers.Default)
             SpawnBulletVisualsRpc(hit.point, true);
 
         }

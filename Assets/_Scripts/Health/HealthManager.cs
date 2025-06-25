@@ -10,6 +10,7 @@ public class HealthManager : NetworkBehaviour
     [SerializeField] private NetworkVariable<float> currentHealth;
 
     [SerializeField] private Slider healthSlider;
+    [SerializeField] private DeathOptions DeathOption = DeathOptions.SetInactive;
 
     public override void OnNetworkSpawn()
     {
@@ -35,7 +36,10 @@ public class HealthManager : NetworkBehaviour
         currentHealth.Value -= _dmg;
 
         if (currentHealth.Value <= 0)
-            NetworkObject.Despawn();
+        {
+            if (DeathOption == DeathOptions.SetInactive) gameObject.SetActive(false);
+            if (DeathOption == DeathOptions.Despawn) NetworkObject.Despawn();
+        }
     }
 
 

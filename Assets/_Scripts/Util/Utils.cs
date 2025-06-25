@@ -12,6 +12,15 @@ public class Utils : MonoBehaviour
         return 1 << (int)layer;
     }
 
+    public static int LayersToLayerMask(Layers[] layers)
+    {
+        int layerMask = 0;
+        foreach (Layers layer in layers)
+            layerMask = layerMask | 1 << (int)layer;
+
+        return layerMask;
+    }
+
     public static Vector2 AdjustVec(Vector2 vector, float x = 0, float y = 0, float z = 0)
     {
         Vector2 adjusted = vector;

@@ -12,6 +12,7 @@ public enum Layers
     UI,
     Tanc,
     Weapon,
+    TancHitbox,
 }
 
 public enum WeaponSlot
@@ -28,4 +29,10 @@ public enum Weapons
     Spud,
     TRifle,
     Package,
+}
+
+public enum DeathOptions
+{
+    Despawn,
+    SetInactive,
 }

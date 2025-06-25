@@ -453,6 +453,7 @@ GameObject:
   - component: {fileID: 91402879}
   - component: {fileID: 91402874}
   - component: {fileID: 91402873}
+  - component: {fileID: 91402880}
   m_Layer: 0
   m_Name: TestDummy (2)
   m_TagString: Untagged
@@ -503,6 +504,7 @@ MonoBehaviour:
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 601292789}
+  DeathOption: 0
 --- !u!136 &91402875
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -613,6 +615,20 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &91402880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 91402872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5beecdc1f55c944bb193aa94d5d719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthManager: {fileID: 91402874}
+  multiplier: 1
 --- !u!1 &125259808
 GameObject:
   m_ObjectHideFlags: 0
@@ -3324,6 +3340,7 @@ GameObject:
   - component: {fileID: 881101832}
   - component: {fileID: 881101827}
   - component: {fileID: 881101826}
+  - component: {fileID: 881101833}
   m_Layer: 0
   m_Name: TestDummy (1)
   m_TagString: Untagged
@@ -3374,6 +3391,7 @@ MonoBehaviour:
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 214118303}
+  DeathOption: 0
 --- !u!136 &881101828
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3484,6 +3502,20 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &881101833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881101825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5beecdc1f55c944bb193aa94d5d719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthManager: {fileID: 881101827}
+  multiplier: 1
 --- !u!1 &931817942
 GameObject:
   m_ObjectHideFlags: 0
@@ -4447,6 +4479,7 @@ GameObject:
   - component: {fileID: 1128740317}
   - component: {fileID: 1128740315}
   - component: {fileID: 1128740316}
+  - component: {fileID: 1128740318}
   m_Layer: 0
   m_Name: TestDummy
   m_TagString: Untagged
@@ -4559,6 +4592,7 @@ MonoBehaviour:
   currentHealth:
     m_InternalValue: 0
   healthSlider: {fileID: 1823955859}
+  DeathOption: 0
 --- !u!54 &1128740316
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4607,6 +4641,20 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1128740318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128740309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5beecdc1f55c944bb193aa94d5d719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthManager: {fileID: 1128740315}
+  multiplier: 1
 --- !u!1 &1139599166
 GameObject:
   m_ObjectHideFlags: 0
