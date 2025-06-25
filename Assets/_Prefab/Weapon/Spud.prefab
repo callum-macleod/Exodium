@@ -105,6 +105,9 @@ PrefabInstance:
       addedObject: {fileID: -9188123960597130940}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f293313e19d592439d9ede8d8e20e60, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 783089074044331291}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f293313e19d592439d9ede8d8e20e60, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 800047694946371143}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f293313e19d592439d9ede8d8e20e60, type: 3}
       insertIndex: -1
@@ -155,7 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponID: 1
-  fireDelayMax: 0.22
+  fireDelayMax: 0.15
   ShootSfx: {fileID: 8236992411107391694, guid: b89a73c21aa7f374da3d348eb120d63a, type: 3}
   AttachedTanc: {fileID: 0}
   tip: {fileID: 458368403607843312}
@@ -163,6 +166,7 @@ MonoBehaviour:
   BulletSpeed: 200
   BulletTrail: {fileID: 4748658696004837488, guid: 2eb4446fb9fe67942b3df840022bdc10, type: 3}
   ammoMgr: {fileID: -9188123960597130940}
+  recoilMgr: {fileID: 783089074044331291}
 --- !u!114 &-9188123960597130940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +181,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ammoMax: 12
   reloadTime: 1
+--- !u!114 &783089074044331291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535780860326277949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a1b012d1254eb499bf05a38dc5f29d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inaccuracyScalar: 0
+  inaccuracyScalarDelta: 0.15
+  maxVerticalRecoil: -5
+  horizontalDelta: 2
+  recoilDecayRate: 0.75
+  movePenalty: 0.2
+  wb: {fileID: -3750377621517193230}
 --- !u!136 &800047694946371143
 CapsuleCollider:
   m_ObjectHideFlags: 0

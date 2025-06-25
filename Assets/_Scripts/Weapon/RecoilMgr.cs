@@ -5,23 +5,23 @@ using UnityEngine;
 
 public class RecoilMgr : MonoBehaviour
 {
-    [SerializeField] float inaccuracyScalar = 0;
-    [SerializeField] float inaccuracyScalarDelta = 0.05f;
-    [SerializeField] readonly float maxVerticalRecoil = -10;
-    [SerializeField] readonly float maxHorizontalDeviation = 2f;
-    [SerializeField] readonly float recoilDecayRate = 0.5f;
-    [SerializeField] float movePenalty = 0.5f;
+    [SerializeField] float inaccuracyScalar = 0;  // tracks the current level of inaccuracy
+    [SerializeField] float inaccuracyScalarDelta = 0.05f;  // how much inaccuracyScalar is increased per shot
+    [SerializeField] float maxVerticalRecoil = -10;  // the maximum level of vertical recoil (in degrees)
+    [SerializeField] float horizontalDelta = 2f;  // the amount which the horizontal recoil deviates per shot (multiplied with inaccuracyScalar)
+    [SerializeField] float recoilDecayRate = 0.5f;  // the rate at which inaccuracy is reduced
+    [SerializeField] float movePenalty = 0.5f;  // the inaccuracy penalty incurred by moving (multiplied with current velocity)
 
     [Header("References")]
     [SerializeField] private WeaponBase wb;
     [NonSerialized] public Transform recoilPointer;
 
+
     public void CalculateBaseInaccuracy()
     {
-        // calculate base inaccuracy
         float currentHorizontal = recoilPointer.transform.localRotation.eulerAngles.y;
-        float potentialDeviation = maxHorizontalDeviation * inaccuracyScalar;
-        float newHor = currentHorizontal + potentialDeviation * UnityEngine.Random.Range(-1f, 1f);
+        float potentialDeviation = horizontalDelta * inaccuracyScalar * UnityEngine.Random.Range(-1f, 1f);  // how much to change horizontal by
+        float newHor = currentHorizontal + potentialDeviation;
 
         recoilPointer.transform.localRotation = Quaternion.Euler(maxVerticalRecoil * inaccuracyScalar, newHor, 0);
     }
