@@ -17,13 +17,17 @@ public class RoundPhaseState : State
     public override void Act()
     {
         if (RemainingRoundTime <= 0) EndRound();
+
+        if (GetParent().GetCurrentState()?.GetType() == typeof(RoundPhaseState))
+        {
+            RoundPhaseState currState = (RoundPhaseState)GetParent().GetCurrentState();
+            GetClientTanc().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
+        }
     }
 
     public void StartRound()
     {
         RoundStartTime = Time.time;
-        // tell everyone the rouds started
-        GetParent().MatchMgr.OnRoundStartRpc();
     }
 
     public void EndRound()
@@ -34,5 +38,10 @@ public class RoundPhaseState : State
     public override void Reset()
     {
         StartRound();
+    }
+
+    Tanc GetClientTanc()
+    {
+        return ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>();
     }
 }

@@ -8,20 +8,6 @@ using UnityEngine;
 public class ClientSideMgr : MonoBehaviour
 {
     public static ClientSideMgr Instance;
-
-    //private NetworkObject clientOwnedTanc;
-    //public NetworkObject ClientOwnedTanc
-    //{
-    //    get
-    //    {
-    //        if (clientOwnedTanc == null) clientOwnedTanc = FindClientOwnedTanc();
-    //        return clientOwnedTanc;
-    //    }
-    //    private set
-    //    {
-    //        clientOwnedTanc = value;
-    //    }
-    //}
     public NetworkObject ClientOwnedTanc { get; private set; }
 
 
@@ -75,10 +61,4 @@ public class ClientSideMgr : MonoBehaviour
     {
         ClientOwnedTanc = tanc;
     }
-
-    //public NetworkObject FindClientOwnedTanc()
-    //{
-    //    Tanc[] tancs = FindObjectsByType<Tanc>(FindObjectsSortMode.InstanceID);
-    //    return tancs[-1].NetworkObject;
-    //}
 }

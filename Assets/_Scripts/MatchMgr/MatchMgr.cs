@@ -43,30 +43,12 @@ public class MatchMgr : NetworkBehaviour
         {
             RoundPhaseState currState = (RoundPhaseState)StateMachine.GetCurrentState();
             GetClientTanc().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
-
-            //if (RemainingRoundTime > 10 )
-            //if (RemainingRoundTime % 10 < 0.1)
-            // send pulse to clients to make sure their timers are synced
-            // set cooldown for next pulse ( could be 0.5s)
-            //else if (RemainingRoundTime > 1)
-            //if (RemainingRoundTime % 1 < 0.1)
-            // send pulse to clients to make sure their timers are synced
-            // set cooldown for next pulse ( could be 0.5s)
-            //else (RemainingRoundTime > 0)
-            // send pulse to clients to make sure their timers are synced
-            // JUST DO IT EVERY FRAME - NO COOLDOWN
         }
     }
 
     private void OwnerUpdate()
     {
 
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void OnRoundStartRpc()
-    {
-        //GetClientTanc().RoundTimerUI;
     }
 
     Tanc GetClientTanc()
@@ -76,7 +58,7 @@ public class MatchMgr : NetworkBehaviour
 
     public void RegisterTanc(Tanc tanc)
     {
-        print($"{{LOCAL}} NOID: {NetworkObjectId} => Registering Tanc {tanc.NetworkObjectId}");
+        print($"{{LOCAL}} OCID: {OwnerClientId} => Registering Tanc {tanc.NetworkObjectId}");
         // if is client: inform server of new player
         if (!IsServer && IsSpawned)
         {
@@ -99,7 +81,7 @@ public class MatchMgr : NetworkBehaviour
     {
         nObjRef.TryGet(out NetworkObject nObj);
         Tanc t = nObj.GetComponent<Tanc>();
-        print($"{{SRPC}} NOID: {NetworkObjectId} => Recieving tanc {t.NetworkObjectId} for registration");
+        print($"{{SRPC}} OCID: {OwnerClientId} => Recieving tanc {t.NetworkObjectId} for registration");
         tancs.Add(t);
 
         UpdateClientTancList();
@@ -107,7 +89,7 @@ public class MatchMgr : NetworkBehaviour
 
     void UpdateClientTancList()
     {
-        print($"{{LOCAL}} NOID: {NetworkObjectId} => Sending updated Tanc list to clients");
+        print($"{{LOCAL}} OCID: {OwnerClientId} => Sending updated Tanc list to clients");
 
 
         List<NetworkObjectReference> nObjRefs = new();
@@ -117,13 +99,6 @@ public class MatchMgr : NetworkBehaviour
             nObjRefs.Add(new NetworkObjectReference(t.NetworkObject));
         }
 
-        //NetworkObjectReference[] nObjRefs = new NetworkObjectReference[] { };
-        //foreach (Tanc t in tancs)
-        //{
-        //    NetworkObjectReference n = new NetworkObjectReference(t.NetworkObject);
-        //    nObjRefs.Append(new NetworkObjectReference(t.NetworkObject));
-        //}
-
         UpdateClientTancListRpc(nObjRefs.ToArray());
     }
 
@@ -131,7 +106,7 @@ public class MatchMgr : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     public void UpdateClientTancListRpc(NetworkObjectReference[] nObjRefs)
     {
-        print($"{{NSRPC}} NOID: {NetworkObjectId} => Recieving updated Tanc list from server");
+        print($"{{NSRPC}} OCID: {OwnerClientId} => Recieving updated Tanc list from server");
         List<Tanc> t = new();
         foreach (NetworkObjectReference nor in nObjRefs)
         {

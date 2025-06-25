@@ -42,6 +42,7 @@ public class StateMachineSAuth : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     void UpdateCurrentStateRpc(int stateIndex)
     {
+        print($"{{ERPC}} OCID: {OwnerClientId} => Updating State to {states[stateIndex].GetType()}");
         currentState = states[stateIndex];
         currentState.Reset();
     }

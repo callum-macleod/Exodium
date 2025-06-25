@@ -362,14 +362,14 @@ public class Tanc : NetworkBehaviour
         if (IsOwner && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
             GetComponent<AmmoDisplayMgr>().gun = weapons[equippedWeaponSlot].GetComponent<TRifle>();
 
-        print($"{{ERPC}} NOID: {NetworkObjectId} => equipping {slot}");
+        print($"{{ERPC}} OCID: {OwnerClientId} => equipping {slot}");
     }
 
 
     [Rpc(SendTo.Server)]
     public void PickupWeaponRpc(Weapons weapon, WeaponSlot slot, NetworkObjectReference weaponToDespawn)
     {
-        print($"{{SRPC}} NOID: {NetworkObjectId} => despawning {weapon}");
+        print($"{{SRPC}} OCID: {OwnerClientId} => despawning {weapon}");
 
         // despawn old weapon
         weaponToDespawn.TryGet(out NetworkObject _weaponToDespawn);
@@ -390,7 +390,7 @@ public class Tanc : NetworkBehaviour
             throw new Exception($"{nameof(PickupWeapon)}() method invoked from NotServer. Should only be called by Server RPC '{nameof(PickupWeaponRpc)}");
 
 
-        print($"{{LOCAL}} NOID: {NetworkObjectId} => picking up {weapon}");
+        print($"{{LOCAL}} OCID: {OwnerClientId} => picking up {weapon}");
 
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
         wb.AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
@@ -405,7 +405,7 @@ public class Tanc : NetworkBehaviour
     public void Attach(GameObject weapon, Weapons weaponID, WeaponSlot slot)
     {
 
-            print($"{{LOCAL}} NOID: {NetworkObjectId} => attaching {weapon}");
+            print($"{{LOCAL}} OCID:  {OwnerClientId} => attaching {weapon}");
             // drop weapon in the desired slot
             DropWeapon(slot);
 
@@ -436,7 +436,7 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject w) || !w.activeSelf)
             return;
 
-        print($"{{LOCAL}} NOID: {NetworkObjectId} => dropping {slot}");
+        print($"{{LOCAL}} OCID:  {OwnerClientId} => dropping {slot}");
 
         GameObject droppedWeapon = weapons[slot];
         weapons.Remove(slot);
