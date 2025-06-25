@@ -17,7 +17,7 @@ public class MainMenu : NetworkBehaviour
         {
             if (IsServer)
             {
-                matchMgr.gameObject.SetActive(true);
+                //matchMgr.gameObject.SetActive(true);
                 matchMgr.StateMachine.UpdateCurrentState(typeof(RoundPhaseState));
             }
         });

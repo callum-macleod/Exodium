@@ -31,13 +31,11 @@ public class StateMachineSAuth : NetworkBehaviour
         if (stateFromPool == null)
             Debug.LogError($"Cannot find State of type {newStateType} in {typeof(StateMachineSAuth)}.{nameof(states)}");
 
-        //if (currentState != null)
-        //    print($"Swapping current state from {currentState.GetType()} to {newStateType}");
-        //else
-        //    print($"Setting current state from to {newStateType}");
+        if (currentState != null)
+            print($"Swapping current state from {currentState.GetType()} to {newStateType}");
+        else
+            print($"Setting current state from to {newStateType}");
 
-        //currentState = stateFromPool;
-        //currentState.Reset();
         UpdateCurrentStateRpc(states.IndexOf(stateFromPool));
     }
 
@@ -53,5 +51,5 @@ public class StateMachineSAuth : NetworkBehaviour
         if (currentState != null) currentState.Act();
     }
 
-    public State GetCurrentState() { return currentState; }
+    public State? GetCurrentState() { return currentState; }
 }

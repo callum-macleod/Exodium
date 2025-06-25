@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using System.Linq;
 
 public class MatchMgr : NetworkBehaviour
 {
@@ -17,9 +18,16 @@ public class MatchMgr : NetworkBehaviour
         }
     }
 
+    [SerializeField] List<Tanc> tancs = new List<Tanc>();
+    public bool RecievedLocalTanc { get; private set; } = false;
+
+    public static MatchMgr Instance;
+    private void Start() { Instance = this; }
+
     public override void OnNetworkSpawn()
     {
-        gameObject.SetActive(false);
+        if (!RecievedLocalTanc && ClientSideMgr.Instance.ClientOwnedTanc != null)
+            RegisterTanc(ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>());
     }
 
     // Update is called once per frame
@@ -31,7 +39,7 @@ public class MatchMgr : NetworkBehaviour
 
     private void ServerUpdate()
     {
-        if (StateMachine.GetCurrentState().GetType() == typeof(RoundPhaseState))
+        if (StateMachine.GetCurrentState()?.GetType() == typeof(RoundPhaseState))
         {
             RoundPhaseState currState = (RoundPhaseState)StateMachine.GetCurrentState();
             GetClientTanc().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
@@ -61,13 +69,76 @@ public class MatchMgr : NetworkBehaviour
         //GetClientTanc().RoundTimerUI;
     }
 
-    ClientSideMgr GetClientSideMgr()
-    {
-        return GameObject.FindGameObjectWithTag("ClientSideMgr").GetComponent<ClientSideMgr>();
-    }
-
     Tanc GetClientTanc()
     {
-        return GetClientSideMgr().ClientOwnedTanc.GetComponent<Tanc>();
+        return ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>();
+    }
+
+    public void RegisterTanc(Tanc tanc)
+    {
+        print($"{{LOCAL}} NOID: {NetworkObjectId} => Registering Tanc {tanc.NetworkObjectId}");
+        // if is client: inform server of new player
+        if (!IsServer && IsSpawned)
+        {
+            RegisterTancRpc(new NetworkObjectReference(tanc.NetworkObject));
+        }
+        else
+        {
+            // if not yet spawned OR is server: add tanc and update clients
+            tancs.Add(tanc);
+
+            // send rpc to clients
+            if (IsSpawned) UpdateClientTancList();
+        }
+
+        RecievedLocalTanc = true;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void RegisterTancRpc(NetworkObjectReference nObjRef)
+    {
+        nObjRef.TryGet(out NetworkObject nObj);
+        Tanc t = nObj.GetComponent<Tanc>();
+        print($"{{SRPC}} NOID: {NetworkObjectId} => Recieving tanc {t.NetworkObjectId} for registration");
+        tancs.Add(t);
+
+        UpdateClientTancList();
+    }
+
+    void UpdateClientTancList()
+    {
+        print($"{{LOCAL}} NOID: {NetworkObjectId} => Sending updated Tanc list to clients");
+
+
+        List<NetworkObjectReference> nObjRefs = new();
+        foreach (Tanc t in tancs)
+        {
+            NetworkObjectReference n = new NetworkObjectReference(t.NetworkObject);
+            nObjRefs.Add(new NetworkObjectReference(t.NetworkObject));
+        }
+
+        //NetworkObjectReference[] nObjRefs = new NetworkObjectReference[] { };
+        //foreach (Tanc t in tancs)
+        //{
+        //    NetworkObjectReference n = new NetworkObjectReference(t.NetworkObject);
+        //    nObjRefs.Append(new NetworkObjectReference(t.NetworkObject));
+        //}
+
+        UpdateClientTancListRpc(nObjRefs.ToArray());
+    }
+
+    // server updating clients' tanc lists
+    [Rpc(SendTo.NotServer)]
+    public void UpdateClientTancListRpc(NetworkObjectReference[] nObjRefs)
+    {
+        print($"{{NSRPC}} NOID: {NetworkObjectId} => Recieving updated Tanc list from server");
+        List<Tanc> t = new();
+        foreach (NetworkObjectReference nor in nObjRefs)
+        {
+            nor.TryGet(out NetworkObject nObj);
+            t.Add(nObj.GetComponent<Tanc>());
+        }
+
+        tancs = t;
     }
 }

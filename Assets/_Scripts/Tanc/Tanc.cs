@@ -89,6 +89,11 @@ public class Tanc : NetworkBehaviour
         if (!IsOwner) return;
 
         ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
+
+        // if matchMgr does not yet have the local tanc
+        if (!MatchMgr.Instance.RecievedLocalTanc)
+            MatchMgr.Instance.RegisterTanc(this);
+
         sKT8Indicator.SetActive(false);
     }
 
@@ -385,7 +390,7 @@ public class Tanc : NetworkBehaviour
             throw new Exception($"{nameof(PickupWeapon)}() method invoked from NotServer. Should only be called by Server RPC '{nameof(PickupWeaponRpc)}");
 
 
-        print($"{{SRPC}} NOID: {NetworkObjectId} => picking up {weapon}");
+        print($"{{LOCAL}} NOID: {NetworkObjectId} => picking up {weapon}");
 
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
         wb.AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
@@ -431,7 +436,7 @@ public class Tanc : NetworkBehaviour
         if (!weapons.TryGetValue(slot, out GameObject w) || !w.activeSelf)
             return;
 
-        print($"{{ERPC}} NOID: {NetworkObjectId} => dropping {slot}");
+        print($"{{LOCAL}} NOID: {NetworkObjectId} => dropping {slot}");
 
         GameObject droppedWeapon = weapons[slot];
         weapons.Remove(slot);
