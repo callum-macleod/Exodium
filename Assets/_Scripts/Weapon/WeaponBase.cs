@@ -19,15 +19,15 @@ public abstract class WeaponBase : NetworkBehaviour
     [SerializeField] protected float fireDelayMax = 0.11f;
 
 
-    // behaviour while detached from a tanc (i.e. on the floor)
+    // behaviour while detached from a rebel (i.e. on the floor)
     [SerializeField] Rigidbody _rigidbody { get; set; }
     [SerializeField] Collider _collider { get; set; }
 
     [SerializeField] protected GameObject ShootSfx;
 
 
-    [SerializeField] public Tanc AttachedTanc;
-    public NetworkVariable<NetworkObjectReference> AttachedTancNetObjRef { get; set; } = new NetworkVariable<NetworkObjectReference>();
+    [SerializeField] public Rebel AttachedRebel;
+    public NetworkVariable<NetworkObjectReference> AttachedRebelNetObjRef { get; set; } = new NetworkVariable<NetworkObjectReference>();
 
     public NetworkVariable<bool> IsDetached { get; private set; } = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -49,17 +49,17 @@ public abstract class WeaponBase : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
-        AttachedTancNetObjRef.OnValueChanged += OnAttachedTancNetObjIDChanged;
+        AttachedRebelNetObjRef.OnValueChanged += OnAttachedRebelNetObjIDChanged;
         IsDetached.OnValueChanged += OnIsDetachedChanged;
     }
 
 
-    protected virtual void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
+    protected virtual void OnAttachedRebelNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
         curr.TryGet(out NetworkObject t);
-        AttachedTanc = t.GetComponent<Tanc>();
+        AttachedRebel = t.GetComponent<Rebel>();
 
-        AttachedTanc.Attach(gameObject, weaponID, WeaponSlot);
+        AttachedRebel.Attach(gameObject, weaponID, WeaponSlot);
     }
 
     void Update() => OnUpdate();
@@ -70,8 +70,8 @@ public abstract class WeaponBase : NetworkBehaviour
 
     private void OnIsDetachedChanged(bool prev,  bool curr)
     {
-        // if detaching: reset attached tanc
-        if (curr) AttachedTanc = null;
+        // if detaching: reset attached rebel
+        if (curr) AttachedRebel = null;
 
         ToggleColliderAndRigidbody(curr);
     }

@@ -10,9 +10,9 @@ public enum Layers
     SolidGround,
     Water,
     UI,
-    Tanc,
+    Rebel,
     Weapon,
-    TancHitbox,
+    RebelHitbox,
 }
 
 public enum WeaponSlot

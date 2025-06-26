@@ -63,7 +63,7 @@ public class Package : WeaponBase
         planting = false;
         Planted = true;
         timeOfPlantCompleted = Time.time;
-        AttachedTanc.DropWeaponRpc(WeaponSlot);
+        AttachedRebel.DropWeaponRpc(WeaponSlot);
     }
 
     private void WhilePlanted()

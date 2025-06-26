@@ -18,16 +18,16 @@ public class MatchMgr : NetworkBehaviour
         }
     }
 
-    [SerializeField] List<Tanc> tancs = new List<Tanc>();
-    public bool RecievedLocalTanc { get; private set; } = false;
+    [SerializeField] List<Rebel> rebels = new List<Rebel>();
+    public bool RecievedLocalRebel { get; private set; } = false;
 
     public static MatchMgr Instance;
     private void Start() { Instance = this; }
 
     public override void OnNetworkSpawn()
     {
-        if (!RecievedLocalTanc && ClientSideMgr.Instance.ClientOwnedTanc != null)
-            RegisterTanc(ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>());
+        if (!RecievedLocalRebel && ClientSideMgr.Instance.ClientOwnedRebel != null)
+            RegisterRebel(ClientSideMgr.Instance.ClientOwnedRebel.GetComponent<Rebel>());
     }
 
     // Update is called once per frame
@@ -42,7 +42,7 @@ public class MatchMgr : NetworkBehaviour
         if (StateMachine.GetCurrentState()?.GetType() == typeof(RoundPhaseState))
         {
             RoundPhaseState currState = (RoundPhaseState)StateMachine.GetCurrentState();
-            GetClientTanc().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
+            GetClientRebel().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
         }
     }
 
@@ -51,69 +51,69 @@ public class MatchMgr : NetworkBehaviour
 
     }
 
-    Tanc GetClientTanc()
+    Rebel GetClientRebel()
     {
-        return ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>();
+        return ClientSideMgr.Instance.ClientOwnedRebel.GetComponent<Rebel>();
     }
 
-    public void RegisterTanc(Tanc tanc)
+    public void RegisterRebel(Rebel rebel)
     {
-        print($"{{LOCAL}} OCID: {OwnerClientId} => Registering Tanc {tanc.NetworkObjectId}");
+        print($"{{LOCAL}} OCID: {OwnerClientId} => Registering Rebel {rebel.NetworkObjectId}");
         // if is client: inform server of new player
         if (!IsServer && IsSpawned)
         {
-            RegisterTancRpc(new NetworkObjectReference(tanc.NetworkObject));
+            RegisterRebelRpc(new NetworkObjectReference(rebel.NetworkObject));
         }
         else
         {
-            // if not yet spawned OR is server: add tanc and update clients
-            tancs.Add(tanc);
+            // if not yet spawned OR is server: add rebel and update clients
+            rebels.Add(rebel);
 
             // send rpc to clients
-            if (IsSpawned) UpdateClientTancList();
+            if (IsSpawned) UpdateClientRebelList();
         }
 
-        RecievedLocalTanc = true;
+        RecievedLocalRebel = true;
     }
 
     [Rpc(SendTo.Server)]
-    public void RegisterTancRpc(NetworkObjectReference nObjRef)
+    public void RegisterRebelRpc(NetworkObjectReference nObjRef)
     {
         nObjRef.TryGet(out NetworkObject nObj);
-        Tanc t = nObj.GetComponent<Tanc>();
-        print($"{{SRPC}} OCID: {OwnerClientId} => Recieving tanc {t.NetworkObjectId} for registration");
-        tancs.Add(t);
+        Rebel t = nObj.GetComponent<Rebel>();
+        print($"{{SRPC}} OCID: {OwnerClientId} => Recieving Rebel {t.NetworkObjectId} for registration");
+        rebels.Add(t);
 
-        UpdateClientTancList();
+        UpdateClientRebelList();
     }
 
-    void UpdateClientTancList()
+    void UpdateClientRebelList()
     {
-        print($"{{LOCAL}} OCID: {OwnerClientId} => Sending updated Tanc list to clients");
+        print($"{{LOCAL}} OCID: {OwnerClientId} => Sending updated Rebel list to clients");
 
 
         List<NetworkObjectReference> nObjRefs = new();
-        foreach (Tanc t in tancs)
+        foreach (Rebel t in rebels)
         {
             NetworkObjectReference n = new NetworkObjectReference(t.NetworkObject);
             nObjRefs.Add(new NetworkObjectReference(t.NetworkObject));
         }
 
-        UpdateClientTancListRpc(nObjRefs.ToArray());
+        UpdateClientRebelListRpc(nObjRefs.ToArray());
     }
 
-    // server updating clients' tanc lists
+    // server updating clients' rebel lists
     [Rpc(SendTo.NotServer)]
-    public void UpdateClientTancListRpc(NetworkObjectReference[] nObjRefs)
+    public void UpdateClientRebelListRpc(NetworkObjectReference[] nObjRefs)
     {
-        print($"{{NSRPC}} OCID: {OwnerClientId} => Recieving updated Tanc list from server");
-        List<Tanc> t = new();
+        print($"{{NSRPC}} OCID: {OwnerClientId} => Recieving updated Rebel list from server");
+        List<Rebel> t = new();
         foreach (NetworkObjectReference nor in nObjRefs)
         {
             nor.TryGet(out NetworkObject nObj);
-            t.Add(nObj.GetComponent<Tanc>());
+            t.Add(nObj.GetComponent<Rebel>());
         }
 
-        tancs = t;
+        rebels = t;
     }
 }

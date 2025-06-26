@@ -43,7 +43,7 @@ public class TRifle : WeaponBase
 
         if (Input.GetKeyDown(KeyCode.R)) ammoMgr.ReloadStartNow();
 
-        if (AttachedTanc != null)
+        if (AttachedRebel != null)
         {
             fireDelay -= Time.deltaTime;
 
@@ -86,9 +86,9 @@ public class TRifle : WeaponBase
 
         recoilMgr.AddMovementPenalty();
 
-        int layerMask = Utils.LayersToLayerMask(new Layers[] { Layers.Default, Layers.SolidGround, Layers.TancHitbox });
+        int layerMask = Utils.LayersToLayerMask(new Layers[] { Layers.Default, Layers.SolidGround, Layers.RebelHitbox });
         // perform raycast
-        if (AttachedTanc != null && Physics.Raycast(AttachedTanc.VerticalRotator.position, recoilMgr.recoilPointer.transform.forward, out RaycastHit hit, maxDistance, layerMask))
+        if (AttachedRebel != null && Physics.Raycast(AttachedRebel.VerticalRotator.position, recoilMgr.recoilPointer.transform.forward, out RaycastHit hit, maxDistance, layerMask))
         {
             //if (hit.collider.gameObject.layer == (int)Layers.TancHitbox)
             //    hit.collider.GetComponent<HitboxScript>().DealDamage(baseDamage);
@@ -118,11 +118,11 @@ public class TRifle : WeaponBase
     }
 
 
-    protected override void OnAttachedTancNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
+    protected override void OnAttachedRebelNetObjIDChanged(NetworkObjectReference prev, NetworkObjectReference curr)
     {
-        base.OnAttachedTancNetObjIDChanged(prev, curr);
+        base.OnAttachedRebelNetObjIDChanged(prev, curr);
 
-        recoilMgr.recoilPointer = AttachedTanc.RecoilPointer;
+        recoilMgr.recoilPointer = AttachedRebel.RecoilPointer;
     }
 
 

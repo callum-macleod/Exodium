@@ -21,7 +21,7 @@ public class RoundPhaseState : State
         if (GetParent().GetCurrentState()?.GetType() == typeof(RoundPhaseState))
         {
             RoundPhaseState currState = (RoundPhaseState)GetParent().GetCurrentState();
-            GetClientTanc().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
+            GetClientRebel().RoundTimerUI.text = currState.RemainingRoundTime.ToString();
         }
     }
 
@@ -40,8 +40,8 @@ public class RoundPhaseState : State
         StartRound();
     }
 
-    Tanc GetClientTanc()
+    Rebel GetClientRebel()
     {
-        return ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>();
+        return ClientSideMgr.Instance.ClientOwnedRebel.GetComponent<Rebel>();
     }
 }

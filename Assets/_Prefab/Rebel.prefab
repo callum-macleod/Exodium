@@ -171,14 +171,14 @@ GameObject:
   - component: {fileID: 6520586061525180518}
   - component: {fileID: 7051077546798470743}
   - component: {fileID: 3317747208427576892}
-  - component: {fileID: 8546204257909267695}
   - component: {fileID: 5121455351405466758}
   - component: {fileID: 8129290164739404589}
   - component: {fileID: 691100717744974590}
   - component: {fileID: 8781877411033705979}
   - component: {fileID: 5887813900750126503}
+  - component: {fileID: 2685167777451114437}
   m_Layer: 6
-  m_Name: Tanc
+  m_Name: Rebel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,45 +282,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8546204257909267695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2140893562268515772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 832c30182cfe6594cb4a9eef005db505, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HorizontalRotator: {fileID: 4365428620273654661}
-  VerticalRotator: {fileID: 4587819814955486716}
-  WeaponSpace: {fileID: 3899069240831065462}
-  weaponSlots:
-  - {fileID: 7639535787658608474}
-  - {fileID: 8974660650966727049}
-  - {fileID: 4591427290271229247}
-  - {fileID: 128759636538237425}
-  GroundChecker: {fileID: 5456907068024958997}
-  jumpForce: 8.5
-  downwardGravity: 1
-  upwardGravity: 1
-  weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
-  nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
-  slerpStrength: 0.2
-  airResistanceMult: 0.15
-  kTDashDuration: 0.15
-  kTDashVelocity: 40
-  kTDashExitV: 3
-  kTSkateDuration: 4
-  currentKTSkateDuration: 0
-  sKT8Indicator: {fileID: 6506851070070788496}
-  LLeg: {fileID: 7837191603901225052}
-  RLeg: {fileID: 8182666052473335980}
-  RecoilPointer: {fileID: 1376576832689583636}
-  Package: {fileID: 8177003038699762012, guid: 67b58d4e670b6c142bdbf7141a46460b, type: 3}
-  RoundTimerUI: {fileID: 2678690982472255530}
 --- !u!114 &5121455351405466758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,6 +371,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2685167777451114437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140893562268515772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e12345e2292215489728f27ab3e44b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HorizontalRotator: {fileID: 4365428620273654661}
+  VerticalRotator: {fileID: 4587819814955486716}
+  WeaponSpace: {fileID: 3899069240831065462}
+  weaponSlots:
+  - {fileID: 7639535787658608474}
+  - {fileID: 8974660650966727049}
+  - {fileID: 4591427290271229247}
+  - {fileID: 128759636538237425}
+  LLeg: {fileID: 7837191603901225052}
+  RLeg: {fileID: 8182666052473335980}
+  GroundChecker: {fileID: 5456907068024958997}
+  RecoilPointer: {fileID: 1376576832689583636}
+  RoundTimerUI: {fileID: 2678690982472255530}
+  weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
+  nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
+  Package: {fileID: 8177003038699762012, guid: 67b58d4e670b6c142bdbf7141a46460b, type: 3}
+  jumpForce: 8.5
+  jumpInputBuffer: 0.1
+  downwardGravity: 1
+  upwardGravity: 1
+  slerpStrength: 0.2
+  airResistanceMult: 0.15
+  kTDashDuration: 0.15
+  kTDashVelocity: 40
+  kTDashExitV: 3
+  kTSkateDuration: 4
+  currentKTSkateDuration: 0
+  sKT8Indicator: {fileID: 6506851070070788496}
 --- !u!1 &2959098203030375826
 GameObject:
   m_ObjectHideFlags: 0

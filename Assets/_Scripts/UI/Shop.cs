@@ -22,6 +22,6 @@ public class Shop : MonoBehaviour
     public void BuyWeapon(Weapons weapon)
     {
         WeaponSlot slot = weaponLookup.Dict[weapon].GetComponent<WeaponBase>().WeaponSlot;
-        ClientSideMgr.Instance.ClientOwnedTanc.GetComponent<Tanc>().PickupWeaponRpc(weapon, slot);
+        ClientSideMgr.Instance.ClientOwnedRebel.GetComponent<Rebel>().PickupWeaponRpc(weapon, slot);
     }
 }

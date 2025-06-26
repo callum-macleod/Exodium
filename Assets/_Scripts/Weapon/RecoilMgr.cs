@@ -29,7 +29,7 @@ public class RecoilMgr : MonoBehaviour
     public void UpdateWeaponSpace()
     {
         if (inaccuracyScalar > 0)  // update weaponspace to match the recoil angle
-            wb.AttachedTanc.WeaponSpace.localRotation = Quaternion.Euler(
+            wb.AttachedRebel.WeaponSpace.localRotation = Quaternion.Euler(
                 recoilPointer.transform.localRotation.eulerAngles.x,
                 recoilPointer.transform.localRotation.eulerAngles.y,
                 0);
@@ -57,7 +57,7 @@ public class RecoilMgr : MonoBehaviour
 
     public void AddMovementPenalty()
     {
-        float currentSpeed = wb.AttachedTanc.GetComponent<Rigidbody>().velocity.magnitude;
+        float currentSpeed = wb.AttachedRebel.GetComponent<Rigidbody>().velocity.magnitude;
         float xPenalty = movePenalty * currentSpeed * UnityEngine.Random.Range(-1f, 1f);
         float yPenalty = movePenalty * currentSpeed * UnityEngine.Random.Range(-1f, 1f);
 

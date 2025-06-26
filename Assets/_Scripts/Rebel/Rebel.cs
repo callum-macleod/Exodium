@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 using UnityEngine.Animations;
 using TMPro;
 
-public class Tanc : NetworkBehaviour
+public class Rebel : NetworkBehaviour
 {
     [Header("References - Self")]
     [SerializeField] Transform HorizontalRotator;
@@ -38,7 +38,7 @@ public class Tanc : NetworkBehaviour
 
 
     [Header("Movement - Basic")]
-    [SerializeField] float jumpForce = 7.5f; // force of the jump
+    [SerializeField] float jumpForce = 8.5f; // force of the jump
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 25; // force multiplier to deceleration force
     int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
@@ -46,8 +46,8 @@ public class Tanc : NetworkBehaviour
     float timeOfLastJump = 0f;  // used to check if jump is on cooldown
     [SerializeField] float jumpInputBuffer = 0.1f; // allows you to input jump before jump is available by n seconds
     float timeOfJumpLastInputted = 0f; // used to check if jump input is being buffered
-    [SerializeField] float downwardGravity = 1f;
-    [SerializeField] float upwardGravity = 0.7f;
+    [SerializeField] float downwardGravity = 1f;  // how much extra gravity is experienced while velocity y component is NEGATIVE
+    [SerializeField] float upwardGravity = 1f;  // how much extra gravity is experienced while velocity y component is POSITIVE
     [SerializeField] public Vector3 Move { get; private set; }
     bool inAir = true;
 
@@ -56,18 +56,18 @@ public class Tanc : NetworkBehaviour
     Dictionary<WeaponSlot, GameObject> weapons = new Dictionary<WeaponSlot, GameObject>();
 
     // detecting nearby weapons
-    float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
+    float pickupRange = 5f;  // how close a rebel needs to be to pick up weapon
 
     [Header("Movement - Air Control")]
-    [SerializeField] public float slerpStrength;
+    [SerializeField] public float slerpStrength = 0.2f;
     private float lowVelocityAirControlThreshold = 4;
-    [SerializeField] public float airResistanceMult = 1.5f;
+    [SerializeField] public float airResistanceMult = 0.15f;
 
     [Header("KT Spells")]
-    [SerializeField] public float kTDashDuration = 0.5f;
+    [SerializeField] public float kTDashDuration = 0.15f;
     private bool kTDashing = false;
     private float currentKTDashDuration = 0f;
-    [SerializeField] public float kTDashVelocity = 15;
+    [SerializeField] public float kTDashVelocity = 40;
     private Vector3 currentKTDashDir;
     private float kTDashCD = 1f;
     private float currentKTDashCD = 0f;
@@ -93,11 +93,11 @@ public class Tanc : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        ClientSideMgr.Instance.SetClientOwnedTanc(GetComponent<NetworkObject>());
+        ClientSideMgr.Instance.SetClientOwnedRebel(GetComponent<NetworkObject>());
 
-        // if matchMgr does not yet have the local tanc
-        if (!MatchMgr.Instance.RecievedLocalTanc)
-            MatchMgr.Instance.RegisterTanc(this);
+        // if matchMgr does not yet have the local rebel
+        if (!MatchMgr.Instance.RecievedLocalRebel)
+            MatchMgr.Instance.RegisterRebel(this);
 
         sKT8Indicator.SetActive(false);
     }
@@ -426,7 +426,7 @@ public class Tanc : NetworkBehaviour
         print($"{{LOCAL}} OCID: {OwnerClientId} => picking up {weapon}");
 
         WeaponBase wb = NetworkManager.SpawnManager.InstantiateAndSpawn(weaponLookup.Dict[weapon], OwnerClientId).GetComponent<WeaponBase>();
-        wb.AttachedTancNetObjRef.Value = new NetworkObjectReference(NetworkObject);
+        wb.AttachedRebelNetObjRef.Value = new NetworkObjectReference(NetworkObject);
     }
 
     /// <summary>
@@ -493,7 +493,7 @@ public class Tanc : NetworkBehaviour
         LLeg.localPosition = new Vector3(0, legN, 0);
         RLeg.localPosition = new Vector3(0, legN, 0);
 
-        // make tanc collider shorter
+        // make rebel collider shorter
         GetComponent<CapsuleCollider>().height = 3.1f + colliderN;
         GroundChecker.transform.position = GroundChecker.transform.position - Vector3.up * colliderN;
         if (!inAir)

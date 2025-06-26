@@ -8,7 +8,7 @@ using UnityEngine;
 public class ClientSideMgr : MonoBehaviour
 {
     public static ClientSideMgr Instance;
-    public NetworkObject ClientOwnedTanc { get; private set; }
+    public NetworkObject ClientOwnedRebel { get; private set; }
 
 
     [SerializeField] public GameObject Shop;
@@ -57,8 +57,8 @@ public class ClientSideMgr : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
     }
 
-    public void SetClientOwnedTanc(NetworkObject tanc)
+    public void SetClientOwnedRebel(NetworkObject rebel)
     {
-        ClientOwnedTanc = tanc;
+        ClientOwnedRebel = rebel;
     }
 }
