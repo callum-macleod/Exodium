@@ -12,26 +12,43 @@ using TMPro;
 
 public class Tanc : NetworkBehaviour
 {
-    // self references
-    Rigidbody rigidBody;
+    [Header("References - Self")]
     [SerializeField] Transform HorizontalRotator;
+    Rigidbody rigidBody;
     [SerializeField] public Transform VerticalRotator;
     [SerializeField] public Transform WeaponSpace;
     [SerializeField] public Transform[] weaponSlots;
 
+    [SerializeField] Transform LLeg;
+    [SerializeField] Transform RLeg;
 
     [SerializeField] Transform GroundChecker;
     float groundCheckRayRadius = 0.3f;
     float groundCheckRayRange = 0.2f;
 
-    // states
+    [SerializeField] public Transform RecoilPointer;
+
+    [SerializeField] public TextMeshProUGUI RoundTimerUI;
+
+
+    [Header("References - External")]
+    [SerializeField] WeaponLookupSO weaponLookup;
+    [SerializeField] public NetworkObject nade;  // TEMP
+    [SerializeField] public NetworkObject Package;  // for testing
+
+
+    [Header("Movement - Basic")]
+    [SerializeField] float jumpForce = 7.5f; // force of the jump
     float acceleration = 55; // force multiplier to acceleration force
     float deceleration = 25; // force multiplier to deceleration force
     int defaultMaxVelocity = 10; // used in case no weapon is equipped (when speed exceeds this value, set movespeed to this value instead.)
-    [SerializeField] float jumpForce = 7.5f; // force of the jump
+    float jumpCooldown = 0.1f; // minimum time between jumping
+    float timeOfLastJump = 0f;  // used to check if jump is on cooldown
+    [SerializeField] float jumpInputBuffer = 0.1f; // allows you to input jump before jump is available by n seconds
+    float timeOfJumpLastInputted = 0f; // used to check if jump input is being buffered
     [SerializeField] float downwardGravity = 1f;
     [SerializeField] float upwardGravity = 0.7f;
-    public Vector3 Move { get; private set; }
+    [SerializeField] public Vector3 Move { get; private set; }
     bool inAir = true;
 
     WeaponSlot equippedWeaponSlot;
@@ -41,43 +58,31 @@ public class Tanc : NetworkBehaviour
     // detecting nearby weapons
     float pickupRange = 5f;  // how close a tanc needs to be to pick up weapon
 
-    [SerializeField] WeaponLookupSO weaponLookup;
-
-    //TEMP
-    public NetworkObject nade;
-
-    public float slerpStrength;
+    [Header("Movement - Air Control")]
+    [SerializeField] public float slerpStrength;
     private float lowVelocityAirControlThreshold = 4;
-    public float airResistanceMult = 1.5f;
+    [SerializeField] public float airResistanceMult = 1.5f;
 
+    [Header("KT Spells")]
+    [SerializeField] public float kTDashDuration = 0.5f;
     private bool kTDashing = false;
-    public float kTDashDuration = 0.5f;
     private float currentKTDashDuration = 0f;
-    public float kTDashVelocity = 15;
+    [SerializeField] public float kTDashVelocity = 15;
     private Vector3 currentKTDashDir;
     private float kTDashCD = 1f;
     private float currentKTDashCD = 0f;
-    public float kTDashExitV = 3;
+    [SerializeField] public float kTDashExitV = 3;
 
     private bool kTSkating = false;
-    public float kTSkateDuration = 4f;
-    public float currentKTSkateDuration;
+    [SerializeField] public float kTSkateDuration = 4f;
+    [SerializeField] public float currentKTSkateDuration;
     private float kTSkateCD = 5f;
     private float currentKTSkateCD = 0f;
-    public GameObject sKT8Indicator;
+    [SerializeField] public GameObject sKT8Indicator;
 
     private float skt8JumpCancelScalar = 0.6f;
 
-    [SerializeField] Transform LLeg;
-    [SerializeField] Transform RLeg;
 
-
-    public Transform RecoilPointer;
-
-    // for testing
-    public NetworkObject Package;
-
-    public TextMeshProUGUI RoundTimerUI;
 
     void Awake()
     {
@@ -108,20 +113,18 @@ public class Tanc : NetworkBehaviour
             currentKTSkateCD -= Time.deltaTime;
 
         // jump
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0) && !inAir && !kTDashing)
+        //if (Input.GetKey(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0)
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetAxis("Mouse ScrollWheel") > 0)
         {
-            rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
-            //if (kTDashing)
-            //{
-            //    CancelKTDash(false);
-            //    rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
-            //}
+            bool success = TryJump();
+
+            if (!success) timeOfJumpLastInputted = Time.time;  // jump not possible, so buffer jump input
         }
-        if (Input.GetKeyDown(KeyCode.Space) && kTDashing)
+        if (Time.time < timeOfJumpLastInputted + jumpInputBuffer)  // if jump buffered
         {
-            CancelKTDash(false);
-            rigidBody.velocity = rigidBody.velocity * skt8JumpCancelScalar;
-            rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
+            bool success = TryJump();
+
+            if (success) timeOfJumpLastInputted -= 1;  // this stops jump buffer until you next input jump
         }
 
         // equip weapons
@@ -193,6 +196,36 @@ public class Tanc : NetworkBehaviour
         // spawn Package (testing
         if (Input.GetKeyDown(KeyCode.CapsLock)) SpawnPackageRpc();
     }
+
+    bool TryJump()
+    {
+        //if jump not on cooldown
+        if (Time.time > timeOfLastJump + jumpCooldown)
+        {
+            if (!inAir && !kTDashing)
+            {
+                Jump();
+                return true;
+            }
+            if (kTDashing)
+            {
+                CancelKTDash(false);
+                rigidBody.velocity *= skt8JumpCancelScalar;
+                Jump();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void Jump()
+    {
+        rigidBody.velocity = Utils.RemoveY(rigidBody.velocity);
+        rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
+        timeOfLastJump = Time.time;
+    }
+
     [Rpc(SendTo.Server)]
     private void SpawnPackageRpc()
     {
