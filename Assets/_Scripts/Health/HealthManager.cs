@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 public class HealthManager : NetworkBehaviour
 {
@@ -37,9 +38,23 @@ public class HealthManager : NetworkBehaviour
 
         if (currentHealth.Value <= 0)
         {
+            if (TryGetComponent(out Rebel rebel))
+            {
+                rebel.DropWeaponRpc(WeaponSlot.Package);
+                rebel.DropHighestWeaponRpc();
+            }
+
+            //Invoke(nameof(Die), 0.5f);
+
             if (DeathOption == DeathOptions.SetInactive) SetInactiveRpc();
             if (DeathOption == DeathOptions.Despawn) NetworkObject.Despawn();
         }
+    }
+
+    void Die()
+    {
+        if (DeathOption == DeathOptions.SetInactive) SetInactiveRpc();
+        if (DeathOption == DeathOptions.Despawn) NetworkObject.Despawn();
     }
 
     [Rpc(SendTo.Everyone)]

@@ -195,6 +195,8 @@ public class Rebel : NetworkBehaviour
 
         // spawn Package (testing
         if (Input.GetKeyDown(KeyCode.CapsLock)) SpawnPackageRpc();
+
+        if (Input.GetKeyDown(KeyCode.LeftShift)) DropHighestWeaponRpc();
     }
 
     bool TryJump()
@@ -390,6 +392,7 @@ public class Rebel : NetworkBehaviour
         // equip new weapon
         equippedWeaponSlot = slot;
         weapons[equippedWeaponSlot].SetActive(true);
+        weapons[equippedWeaponSlot].transform.position = Camera.main.transform.position;
         WeaponSpace.localRotation = Quaternion.identity;
 
         if (IsOwner && weapons[equippedWeaponSlot].GetComponent<TRifle>() != null)
@@ -463,7 +466,24 @@ public class Rebel : NetworkBehaviour
         DropWeapon(slot);
     }
 
-    public void DropWeapon(WeaponSlot slot)
+    [Rpc(SendTo.Everyone)]
+    public void DropHighestWeaponRpc()
+    {
+        bool success = false;
+        int weaponSlot = 0;
+        while (!success && weaponSlot < 3)
+        {
+            if (weapons.TryGetValue((WeaponSlot)weaponSlot, out GameObject weapon))
+            {
+                EquipWeaponRpc((WeaponSlot)weaponSlot);
+                DropWeaponRpc((WeaponSlot)weaponSlot);
+                success = true;
+            }
+            weaponSlot++;
+        }
+    }
+
+    private void DropWeapon(WeaponSlot slot)
     {
         // if no weapon in slot: do nothing
         if (!weapons.TryGetValue(slot, out GameObject w) || !w.activeSelf)
