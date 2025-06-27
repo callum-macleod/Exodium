@@ -37,10 +37,13 @@ public class HealthManager : NetworkBehaviour
 
         if (currentHealth.Value <= 0)
         {
-            if (DeathOption == DeathOptions.SetInactive) gameObject.SetActive(false);
+            if (DeathOption == DeathOptions.SetInactive) SetInactiveRpc();
             if (DeathOption == DeathOptions.Despawn) NetworkObject.Despawn();
         }
     }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetInactiveRpc() { gameObject.SetActive(false); }
 
 
     [Rpc(SendTo.Server)]
