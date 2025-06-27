@@ -195,8 +195,6 @@ public class Rebel : NetworkBehaviour
 
         // spawn Package (testing
         if (Input.GetKeyDown(KeyCode.CapsLock)) SpawnPackageRpc();
-
-        if (Input.GetKeyDown(KeyCode.LeftShift)) DropHighestWeaponRpc();
     }
 
     bool TryJump()
