@@ -2132,6 +2132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3219e74c38317724d9911d4dcc6fe3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rebels: []
 --- !u!4 &627072093
 Transform:
   m_ObjectHideFlags: 0
@@ -3728,6 +3729,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: b411ae604d25db0479d626f0590d9214, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b411ae604d25db0479d626f0590d9214, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.6
@@ -9035,6 +9040,10 @@ PrefabInstance:
       value: 3647924922
       objectReference: {fileID: 0}
     - target: {fileID: 2839734682523847984, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2839734682523847984, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.099793896
       objectReference: {fileID: 0}
@@ -9087,18 +9096,18 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1899052574}
+  - {fileID: 1208427982}
   - {fileID: 705507995}
-  - {fileID: 625681741}
+  - {fileID: 1825585669}
+  - {fileID: 627072093}
+  - {fileID: 6384062104132939261}
+  - {fileID: 937337457}
+  - {fileID: 1941136192}
   - {fileID: 1594953261}
+  - {fileID: 945835748}
+  - {fileID: 625681741}
   - {fileID: 1128740314}
   - {fileID: 881101831}
   - {fileID: 91402878}
-  - {fileID: 6384062104132939261}
-  - {fileID: 937337457}
-  - {fileID: 1899052574}
-  - {fileID: 1825585669}
-  - {fileID: 1941136192}
-  - {fileID: 1208427982}
   - {fileID: 253886569}
-  - {fileID: 945835748}
-  - {fileID: 627072093}

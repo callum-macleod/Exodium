@@ -35,6 +35,7 @@ public class Rebel : NetworkBehaviour
     [SerializeField] WeaponLookupSO weaponLookup;
     [SerializeField] public NetworkObject nade;  // TEMP
     [SerializeField] public NetworkObject Package;  // for testing
+    [SerializeField] public NetworkObject KTLaunchPad;  // for testing
 
 
     [Header("Movement - Basic")]
@@ -59,7 +60,8 @@ public class Rebel : NetworkBehaviour
     float pickupRange = 5f;  // how close a rebel needs to be to pick up weapon
 
     [Header("Movement - Air Control")]
-    [SerializeField] public float slerpStrength = 0.2f;
+    [SerializeField] public float slerpStrength = 0.2f;   // used when player is turning a lot and wants maximum turn speed
+    [SerializeField] public float notForward = 0f;
     private float lowVelocityAirControlThreshold = 4;
     [SerializeField] public float airResistanceMult = 0.15f;
 
@@ -72,6 +74,7 @@ public class Rebel : NetworkBehaviour
     private float kTDashCD = 1f;
     private float currentKTDashCD = 0f;
     [SerializeField] public float kTDashExitV = 3;
+    private float skt8JumpCancelScalar = 0.6f;
 
     private bool kTSkating = false;
     [SerializeField] public float kTSkateDuration = 4f;
@@ -80,7 +83,9 @@ public class Rebel : NetworkBehaviour
     private float currentKTSkateCD = 0f;
     [SerializeField] public GameObject sKT8Indicator;
 
-    private float skt8JumpCancelScalar = 0.6f;
+    [SerializeField] public float throwStrength;
+
+
 
 
 
@@ -179,12 +184,17 @@ public class Rebel : NetworkBehaviour
         }
 
         // SKT8
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             if (!kTSkating)
                 StartKTSkate();
             else
                 CancelKTSkate();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            ThrowKTJumpPadRpc();
         }
 
         // crouching
@@ -272,7 +282,8 @@ public class Rebel : NetworkBehaviour
     /// <returns></returns>
     bool DotNotForward(float dot)
     {
-        return dot <= 0.1f;
+        return dot <= notForward;
+        //return dot <= 0.1f;
     }
 
 
@@ -595,5 +606,13 @@ public class Rebel : NetworkBehaviour
         kTSkating = false;
         currentKTSkateDuration = 0f;
         sKT8Indicator.SetActive(false);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void ThrowKTJumpPadRpc()
+    {
+        NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(KTLaunchPad);
+        no.transform.position = WeaponSpace.position;
+        no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * throwStrength;
     }
 }

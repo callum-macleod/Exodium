@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3884698604
+  GlobalObjectIdHash: 4080243202
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -386,18 +386,21 @@ MonoBehaviour:
   weaponLookup: {fileID: 11400000, guid: aba85a7f204334547b0380897df322d4, type: 2}
   nade: {fileID: -2498562007505618183, guid: ee8fca6c13a7b78479e1ac71a890d176, type: 3}
   Package: {fileID: 8177003038699762012, guid: 67b58d4e670b6c142bdbf7141a46460b, type: 3}
+  KTLaunchPad: {fileID: -5650006919733045183, guid: cd864094721fedb4c93c3440dd5f18a1, type: 3}
   jumpForce: 8.5
   jumpInputBuffer: 0.1
   downwardGravity: 1
   upwardGravity: 1
   slerpStrength: 0.2
-  airResistanceMult: 0.15
+  notForward: 0
+  airResistanceMult: 0.1
   kTDashDuration: 0.15
   kTDashVelocity: 40
   kTDashExitV: 3
   kTSkateDuration: 4
   currentKTSkateDuration: 0
   sKT8Indicator: {fileID: 6506851070070788496}
+  throwStrength: 10
 --- !u!1 &2959098203030375826
 GameObject:
   m_ObjectHideFlags: 0
