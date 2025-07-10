@@ -14,6 +14,8 @@ public class ClientSideMgr : MonoBehaviour
     [SerializeField] public GameObject Shop;
     [NonSerialized] public bool ShopActive = false;
 
+    [SerializeField] public GameObject RebelSelect;
+    [NonSerialized] public bool RebelSelectActive = false;
 
     [SerializeField] GameObject mainMenu;
     [NonSerialized] public bool MainMenuActive = false;
@@ -22,7 +24,7 @@ public class ClientSideMgr : MonoBehaviour
     {
         get
         {
-            return (ShopActive || MainMenuActive);
+            return (ShopActive || MainMenuActive || RebelSelectActive);
         }
     }
 
@@ -45,6 +47,12 @@ public class ClientSideMgr : MonoBehaviour
         {
             MainMenuActive = !MainMenuActive;
             mainMenu.SetActive(MainMenuActive);
+            UpdateCursorLock();
+        }
+        if (Input.GetKeyDown(KeyCode.CapsLock))
+        {
+            RebelSelectActive = !RebelSelectActive;
+            RebelSelect.SetActive(RebelSelectActive);
             UpdateCursorLock();
         }
     }

@@ -11,7 +11,7 @@ public class Rebel : NetworkBehaviour
 
     #region PROPS AND FIELDS
     [Header("Rebel")]
-    [SerializeField] Rebels rebel = Rebels.SKT8;
+    [SerializeField] public Rebels rebel = Rebels.SKT8;
     [SerializeField] KeybindsSO Keybinds;
 
     Dictionary<Rebels, Dictionary<AbililtyN, string>> AbilityActions = new Dictionary<Rebels, Dictionary<AbililtyN, string>>()
@@ -199,32 +199,15 @@ public class Rebel : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
 
+
+        //////////////////////////// GET ABILITY INPUTS /////////////
+        // foreach ability:
+            // if keybind exists && user has inputted key:
+                // invoke the associated ability
         KeyCode key;
         foreach (AbililtyN ability in Enum.GetValues(typeof(AbililtyN)))
             if (TryGetKeybind(ability, out key) && Input.GetKeyDown(key))
                 Invoke(AbilityActions[rebel][ability], 0);
-
-        //// KTDash
-        //if (TryGetKeybind(AbililtyN.Ability1, out KeyCode key) && Input.GetKeyDown(key))
-        //{
-        //    Invoke(AbilityActions[rebel][AbililtyN.Ability1], 0);
-        //    //StartKTDash();
-        //}
-
-        //// KTJumpPad
-        //if (TryGetKeybind(AbililtyN.Ability2, out key) && Input.GetKeyDown(key))
-        //{
-        //    ThrowKTJumpPadRpc();
-        //}
-
-        //// SKT8
-        //if (TryGetKeybind(AbililtyN.Ability3, out key) && Input.GetKeyDown(key))
-        //{
-        //    if (!kTSkating)
-        //        StartKTSkate();
-        //    else
-        //        CancelKTSkate();
-        //}
 
         // crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
