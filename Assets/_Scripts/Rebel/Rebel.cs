@@ -70,7 +70,8 @@ public class Rebel : NetworkBehaviour
     private float kTDashCD = 1f;
     private float currentKTDashCD = 0f;
     [SerializeField] public float kTDashExitV = 3;
-    private float skt8JumpCancelScalar = 0.6f;
+    private float skt8DashToJumpCancelScalar = 0.6f;
+    [SerializeField] float skt8DashToSkateCancelScalar = 1f;
 
     private bool kTSkating = false;
     [SerializeField] public float kTSkateDuration = 4f;
@@ -78,6 +79,9 @@ public class Rebel : NetworkBehaviour
     private float kTSkateCD = 5f;
     private float currentKTSkateCD = 0f;
     [SerializeField] public GameObject sKT8Indicator;
+    [SerializeField] float ktSkateMaxVMultiplier = 1.5f;
+    [SerializeField] float ktSkateAccelerationMultiplier = 0.5f;
+    [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;
 
     [SerializeField] public float throwStrength;
     #endregion PROPS AND FIELDS
@@ -141,9 +145,9 @@ public class Rebel : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.G))
             DropWeaponRpc(equippedWeaponSlot);
 
-        // throw nade
-        if (Input.GetKeyDown(KeyCode.C))
-            ThrowNadeRpc();
+        //// throw nade
+        //if (Input.GetKeyDown(KeyCode.C))
+        //    ThrowNadeRpc();
 
         // pickup weapon
         if (Input.GetKeyDown(KeyCode.F))
@@ -214,8 +218,7 @@ public class Rebel : NetworkBehaviour
             }
             if (kTDashing)
             {
-                CancelKTDash(false);
-                rigidBody.velocity *= skt8JumpCancelScalar;
+                CancelKTDash(false, skt8DashToJumpCancelScalar);
                 Jump();
                 return true;
             }
@@ -273,28 +276,6 @@ public class Rebel : NetworkBehaviour
         inAir = !Physics.SphereCast(origin, rayRadius, Vector3.down, out RaycastHit hit, rayRange, Utils.LayerToLayerMask(Layers.SolidGround));
     }
 
-    /// <summary>
-    /// if movement input not forward (within custom threshold)
-    /// </summary>
-    /// <param name="dot"></param>
-    /// <returns></returns>
-    bool DotNotForward(float dot)
-    {
-        return dot <= notForward;
-        //return dot <= 0.1f;
-    }
-
-
-    /// <summary>
-    /// if movement input not directly backwards (within custom threshold)
-    /// </summary>
-    /// <param name="dot"></param>
-    /// <returns></returns>
-    bool DotNotDirectlyBackwards(float dot)
-    {
-        return dot >= -0.8f;
-    }
-
     // redistribute velocity
     void CalculateMovement()
     {
@@ -308,15 +289,24 @@ public class Rebel : NetworkBehaviour
             ? weapons[equippedWeaponSlot].GetComponent<WeaponBase>().MaxVelocity
             : defaultMaxVelocity;
 
+        float maxVMultiplier = (kTSkating)
+            ? ktSkateMaxVMultiplier
+            : 1f;
+
+        maxV = maxV * maxVMultiplier;
 
         ///////////////////////////////////// REDUCE SPEED IF OVER MAXIMUM VELOCITY ///////////////////////////
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         // This is only run whilst on the ground
         if (Move != Vector3.zero && xzVelocity.magnitude > maxV)
-        //if (!inAir && !kTSkating && Move != Vector3.zero && xzVelocity.magnitude > maxV)
         {
-            float strength = (inAir || kTSkating) ? airResistanceMult : 1f;
+            //float strength = (inAir) ? airResistanceMult : 1f;
+            //strength = (!inAir && kTSkating) ? ktSkateMaxVCompensationMultiplier : strength;
+            float strength = 1f;
+            if (inAir) strength = airResistanceMult;
+            else if (kTSkating) strength = ktSkateMaxVCompensationMultiplier;
+
             float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
@@ -330,7 +320,7 @@ public class Rebel : NetworkBehaviour
 
 
         ///////////////////////////////////// APPLY NEW MOVEMENT ///////////////////////////
-        if (inAir || kTSkating)  // AIR CONTROL
+        if (inAir)  // AIR CONTROL
         {
             // use dot product to determine how aligned or misaligned current velocity and movement input are
             float dot = Vector3.Dot(xzVelocity.normalized, Move.normalized); 
@@ -364,7 +354,11 @@ public class Rebel : NetworkBehaviour
         }
         else  // GROUND MOVEMENT
         {
-            rigidBody.AddForce(Move * acceleration);
+            float accelerationMultiplier = (kTSkating)
+                ? ktSkateAccelerationMultiplier
+                : 1f;
+
+            rigidBody.AddForce(Move * acceleration * accelerationMultiplier);
         }
 
 
@@ -380,6 +374,28 @@ public class Rebel : NetworkBehaviour
                 rigidBody.AddForce(new Vector3(-rigidBody.velocity.x, 0, -rigidBody.velocity.z).normalized * deceleration);
             }
         }
+    }
+
+    /// <summary>
+    /// if movement input not forward (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
+    bool DotNotForward(float dot)
+    {
+        return dot <= notForward;
+        //return dot <= 0.1f;
+    }
+
+
+    /// <summary>
+    /// if movement input not directly backwards (within custom threshold)
+    /// </summary>
+    /// <param name="dot"></param>
+    /// <returns></returns>
+    bool DotNotDirectlyBackwards(float dot)
+    {
+        return dot >= -0.8f;
     }
 
 
@@ -566,13 +582,13 @@ public class Rebel : NetworkBehaviour
         rigidBody.velocity = currentKTDashDir.normalized * kTDashVelocity;
     }
 
-    private void CancelKTDash(bool stopMomentum)
+    private void CancelKTDash(bool stopMomentum, float velocityScalar = 1f )
     {
         kTDashing = false;
-        if (stopMomentum)
-            rigidBody.velocity = kTDashExitV * Move.normalized;
-        else
-            rigidBody.velocity *= 1;
+
+        if (stopMomentum) rigidBody.velocity = kTDashExitV * Move.normalized;
+
+        else rigidBody.velocity *= velocityScalar;
 
         currentKTDashDuration = 0;
     }
@@ -591,7 +607,7 @@ public class Rebel : NetworkBehaviour
         sKT8Indicator.SetActive(true);
 
         if (kTDashing)
-            CancelKTDash(false);
+            CancelKTDash(false, skt8DashToSkateCancelScalar);
     }
 
     private void KTSkate()

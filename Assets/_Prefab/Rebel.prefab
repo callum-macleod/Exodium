@@ -397,9 +397,13 @@ MonoBehaviour:
   kTDashDuration: 0.15
   kTDashVelocity: 40
   kTDashExitV: 3
+  skt8DashToSkateCancelScalar: 0.8
   kTSkateDuration: 4
   currentKTSkateDuration: 0
   sKT8Indicator: {fileID: 6506851070070788496}
+  ktSkateMaxVMultiplier: 1.5
+  ktSkateAccelerationMultiplier: 0.5
+  ktSkateMaxVCompensationMultiplier: 0.5
   throwStrength: 10
 --- !u!1 &2959098203030375826
 GameObject:
