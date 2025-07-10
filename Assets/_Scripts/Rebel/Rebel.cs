@@ -1,17 +1,13 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEditor;
-using UnityEngine.UIElements;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using JetBrains.Annotations;
 using UnityEngine.Animations;
 using TMPro;
 
 public class Rebel : NetworkBehaviour
 {
+    #region PROPS AND FIELDS
     [Header("References - Self")]
     [SerializeField] Transform HorizontalRotator;
     Rigidbody rigidBody;
@@ -84,11 +80,10 @@ public class Rebel : NetworkBehaviour
     [SerializeField] public GameObject sKT8Indicator;
 
     [SerializeField] public float throwStrength;
+    #endregion PROPS AND FIELDS
 
 
-
-
-
+    #region CORE METHODS
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
@@ -267,7 +262,10 @@ public class Rebel : NetworkBehaviour
         if (kTDashing) KTDash();
         if (kTSkating) KTSkate();
     }
+    #endregion CORE METHODS
 
+
+    #region CORE MOVEMENT
     void GroundCheck(float rayRadius, float rayRange)
     {
         // start spherecast from slight above groundchecker (if origin is within radius of target, then sphere cast shits itself and dies and does not work)
@@ -384,6 +382,34 @@ public class Rebel : NetworkBehaviour
         }
     }
 
+
+    [Rpc(SendTo.Server)]
+    private void ToggleCrouchRpc(bool crouch)
+    {
+        float legN = (crouch) ? 0.5f : 0;
+        float colliderN = (crouch) ? -0.5f : 0.5f;
+
+        // make legs smaller
+        LLeg.localScale = new Vector3(1, 1 - legN, 1);
+        RLeg.localScale = new Vector3(1, 1 - legN, 1);
+
+        // move legs upwards
+        LLeg.localPosition = new Vector3(0, legN, 0);
+        RLeg.localPosition = new Vector3(0, legN, 0);
+
+        // make rebel collider shorter
+        GetComponent<CapsuleCollider>().height = 3.1f + colliderN;
+        GroundChecker.transform.position = GroundChecker.transform.position - Vector3.up * colliderN;
+        if (!inAir)
+        {
+            transform.position = transform.position + Vector3.up * colliderN;
+            //GroundChecker.transform.position = Vector3.up * 2f;
+        }
+    }
+    #endregion CORE MOVEMENT
+
+
+    #region WEAPON
     [Rpc(SendTo.Everyone)]
     public void EquipWeaponRpc(WeaponSlot slot)
     {
@@ -507,32 +533,10 @@ public class Rebel : NetworkBehaviour
         droppedWeapon.transform.Rotate(-1 * droppedWeapon.transform.localRotation.eulerAngles.x, 0, 0);
         droppedWeapon.GetComponent<ParentConstraint>().constraintActive = false;
     }
-
-    [Rpc(SendTo.Server)]
-    private void ToggleCrouchRpc(bool crouch)
-    {
-        float legN = (crouch) ? 0.5f : 0;
-        float colliderN = (crouch) ? -0.5f : 0.5f;
-
-        // make legs smaller
-        LLeg.localScale = new Vector3(1, 1 - legN, 1);
-        RLeg.localScale = new Vector3(1, 1 - legN, 1);
-
-        // move legs upwards
-        LLeg.localPosition = new Vector3(0, legN, 0);
-        RLeg.localPosition = new Vector3(0, legN, 0);
-
-        // make rebel collider shorter
-        GetComponent<CapsuleCollider>().height = 3.1f + colliderN;
-        GroundChecker.transform.position = GroundChecker.transform.position - Vector3.up * colliderN;
-        if (!inAir)
-        {
-            transform.position = transform.position + Vector3.up * colliderN;
-            //GroundChecker.transform.position = Vector3.up * 2f;
-        }
-    }
+    #endregion WEAPON
 
 
+    #region ABILITIES
     [Rpc(SendTo.Server)]
     private void ThrowNadeRpc()
     {
@@ -615,4 +619,5 @@ public class Rebel : NetworkBehaviour
         no.transform.position = WeaponSpace.position;
         no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * throwStrength;
     }
+    #endregion ABILITIES
 }
