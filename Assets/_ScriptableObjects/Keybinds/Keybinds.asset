@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af07b6e2c1a30bc449035c1a1d1c80f2, type: 3}
+  m_Name: Keybinds
+  m_EditorClassIdentifier: 
+  Keybinds:
+    _serializedList:
+    - Key: 0
+      Value: {fileID: 11400000, guid: 8bddac02f177ed14c8cd2b83e95cd073, type: 2}
+    - Key: 1
+      Value: {fileID: 11400000, guid: bd3b0e9e052cd4d4d844c6fee5dd8f46, type: 2}

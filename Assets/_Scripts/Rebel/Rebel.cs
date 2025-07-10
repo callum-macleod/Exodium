@@ -4,10 +4,34 @@ using System;
 using Unity.Netcode;
 using UnityEngine.Animations;
 using TMPro;
+using System.Runtime.CompilerServices;
 
 public class Rebel : NetworkBehaviour
 {
+
     #region PROPS AND FIELDS
+    [Header("Rebel")]
+    [SerializeField] Rebels rebel = Rebels.SKT8;
+    [SerializeField] KeybindsSO Keybinds;
+
+    Dictionary<Rebels, Dictionary<AbililtyN, string>> AbilityActions = new Dictionary<Rebels, Dictionary<AbililtyN, string>>()
+    {
+        { Rebels.SKT8, new Dictionary<AbililtyN, string> () {
+            { AbililtyN.Ability1, nameof(StartKTDash) },
+            { AbililtyN.Ability2, nameof(ThrowKTJumpPadRpc) },
+            { AbililtyN.Ability3, nameof(StartKTSkate) },
+            { AbililtyN.Ability4, nameof(StartKTDash) },
+        } },
+
+        { Rebels.Emerald, new Dictionary<AbililtyN, string> () {
+            { AbililtyN.Ability1, nameof(StartKTDash) },
+            { AbililtyN.Ability2, nameof(ThrowKTJumpPadRpc) },
+            { AbililtyN.Ability3, nameof(StartKTSkate) },
+            { AbililtyN.Ability4, nameof(StartKTDash) },
+        } },
+    };
+
+
     [Header("References - Self")]
     [SerializeField] Transform HorizontalRotator;
     Rigidbody rigidBody;
@@ -81,10 +105,11 @@ public class Rebel : NetworkBehaviour
     [SerializeField] public GameObject sKT8Indicator;
     [SerializeField] float ktSkateMaxVMultiplier = 1.5f;
     [SerializeField] float ktSkateAccelerationMultiplier = 0.5f;
-    [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;
+    [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;    
 
     [SerializeField] public float throwStrength;
     #endregion PROPS AND FIELDS
+
 
 
     #region CORE METHODS
@@ -174,27 +199,32 @@ public class Rebel : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift))
             rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
 
-        // KTDash
-        if (Input.GetKey(KeyCode.E)
-            && currentKTDashCD <= 0
-            && (Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal"))) != 0)
-        {
-            StartKTDash();
-        }
+        KeyCode key;
+        foreach (AbililtyN ability in Enum.GetValues(typeof(AbililtyN)))
+            if (TryGetKeybind(ability, out key) && Input.GetKeyDown(key))
+                Invoke(AbilityActions[rebel][ability], 0);
 
-        // SKT8
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if (!kTSkating)
-                StartKTSkate();
-            else
-                CancelKTSkate();
-        }
+        //// KTDash
+        //if (TryGetKeybind(AbililtyN.Ability1, out KeyCode key) && Input.GetKeyDown(key))
+        //{
+        //    Invoke(AbilityActions[rebel][AbililtyN.Ability1], 0);
+        //    //StartKTDash();
+        //}
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            ThrowKTJumpPadRpc();
-        }
+        //// KTJumpPad
+        //if (TryGetKeybind(AbililtyN.Ability2, out key) && Input.GetKeyDown(key))
+        //{
+        //    ThrowKTJumpPadRpc();
+        //}
+
+        //// SKT8
+        //if (TryGetKeybind(AbililtyN.Ability3, out key) && Input.GetKeyDown(key))
+        //{
+        //    if (!kTSkating)
+        //        StartKTSkate();
+        //    else
+        //        CancelKTSkate();
+        //}
 
         // crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -239,6 +269,12 @@ public class Rebel : NetworkBehaviour
     {
         NetworkObject p = NetworkManager.SpawnManager.InstantiateAndSpawn(Package);
         p.transform.position = Vector3.up * 3f;
+    }
+
+    private bool TryGetKeybind(AbililtyN abilityN, out KeyCode result)
+    {
+        Keybinds.Keybinds.TryGetValue(rebel, out KeybindsBaseSO bindings);
+        return bindings.AbilityKeybinds.TryGetValue(abilityN, out result);
     }
 
     private void FixedUpdate()
@@ -563,6 +599,10 @@ public class Rebel : NetworkBehaviour
 
     private void StartKTDash()
     {
+        // if on cooldown or no input is given: return;
+        if (currentKTDashCD > 0 || (Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal"))) == 0) return;
+
+
         kTDashing = true;
         currentKTDashDuration = kTDashDuration;
         currentKTDashCD = kTDashCD;

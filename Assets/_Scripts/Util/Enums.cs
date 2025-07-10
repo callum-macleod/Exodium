@@ -33,6 +33,20 @@ public enum Weapons
 
 public enum DeathOptions
 {
-    Despawn,
+    Despawn = 0,
     SetInactive,
+}
+
+public enum Rebels
+{
+    SKT8 = 0,
+    Emerald,
+}
+
+public enum AbililtyN
+{
+    Ability1 = 1,
+    Ability2,
+    Ability3,
+    Ability4,
 }

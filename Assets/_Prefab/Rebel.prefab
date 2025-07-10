@@ -370,6 +370,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e12345e2292215489728f27ab3e44b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rebel: 0
+  Keybinds: {fileID: 11400000, guid: 4a12335e8a826e648bf8347c5a04d11e, type: 2}
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
   WeaponSpace: {fileID: 3899069240831065462}
