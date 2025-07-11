@@ -12,6 +12,7 @@ public class Arrow : NetworkBehaviour
 
     [SerializeField] Transform graphic;
     [SerializeField] EmeraldKeybindsSO keybinds;
+    [SerializeField] NetworkObject explosion;
 
     bool guiding = true;
     float speed = 50f;
@@ -54,5 +55,13 @@ public class Arrow : NetworkBehaviour
     Vector3 GetRebelVertical()
     {
         return ClientSideMgr.Instance.ClientOwnedRebel.GetComponent<Rebel>().VerticalRotator.forward;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(explosion);
+        no.transform.position = collision.contacts[0].point;
+
+        NetworkObject.Despawn();
     }
 }
