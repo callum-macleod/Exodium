@@ -35,6 +35,26 @@ public class Utils : MonoBehaviour
         return vector - new Vector3(0, vector.y, 0);
     }
 
+    public static Vector3 AdjustXYZ(Vector3 vector, float x, float y, float z)
+    {
+        Vector3 vectorOut = vector;
+        vectorOut.x += x;
+        vectorOut.y += y;
+        vectorOut.z += z;
+
+        return vectorOut;
+    }
+
+    public static Vector3 ComponentWiseMult(Vector3 vectorA, Vector3 vectorB)
+    {
+        Vector3 vectorOut = vectorA;
+        vectorOut.x *= vectorB.x;
+        vectorOut.y *= vectorB.y;
+        vectorOut.z *= vectorB.z;
+
+        return vectorOut;
+    }
+
     public static Vector2 AsV2(Vector3 vector3)
     {
         return new Vector2(vector3.x, vector3.y);

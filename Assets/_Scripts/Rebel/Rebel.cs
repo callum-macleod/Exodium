@@ -33,7 +33,7 @@ public class Rebel : NetworkBehaviour
 
 
     [Header("References - Self")]
-    [SerializeField] Transform HorizontalRotator;
+    [SerializeField] public Transform HorizontalRotator;
     Rigidbody rigidBody;
     [SerializeField] public Transform VerticalRotator;
     [SerializeField] public Transform WeaponSpace;

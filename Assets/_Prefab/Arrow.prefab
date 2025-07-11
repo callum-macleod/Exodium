@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentDownwardVelocity: -2
   graphic: {fileID: 919352673306636154}
+  keybinds: {fileID: 11400000, guid: bd3b0e9e052cd4d4d844c6fee5dd8f46, type: 2}
 --- !u!1 &7140771858722894050
 GameObject:
   m_ObjectHideFlags: 0
