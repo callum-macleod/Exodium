@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4080243202
+  GlobalObjectIdHash: 3884698604
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -407,6 +407,8 @@ MonoBehaviour:
   ktSkateAccelerationMultiplier: 0.5
   ktSkateMaxVCompensationMultiplier: 0.5
   throwStrength: 10
+  arrow: {fileID: -1361120243015969935, guid: 29e3a7c9e9bd1734da908eebd9f0286b, type: 3}
+  arrowFireSpeed: 10
 --- !u!1 &2959098203030375826
 GameObject:
   m_ObjectHideFlags: 0

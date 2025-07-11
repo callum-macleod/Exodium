@@ -24,10 +24,10 @@ public class Rebel : NetworkBehaviour
         } },
 
         { Rebels.Emerald, new Dictionary<AbililtyN, string> () {
-            { AbililtyN.Ability1, nameof(StartKTDash) },
-            { AbililtyN.Ability2, nameof(ThrowKTJumpPadRpc) },
-            { AbililtyN.Ability3, nameof(StartKTSkate) },
-            { AbililtyN.Ability4, nameof(StartKTDash) },
+            { AbililtyN.Ability1, nameof(StartPerch) },
+            { AbililtyN.Ability2, nameof(StartEmeraldArrowRpc) },
+            { AbililtyN.Ability3, nameof(StartEarthlyRootArrow) },
+            { AbililtyN.Ability4, nameof(StartCommune) },
         } },
     };
 
@@ -108,8 +108,12 @@ public class Rebel : NetworkBehaviour
     [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;    
 
     [SerializeField] public float throwStrength;
-    #endregion PROPS AND FIELDS
 
+    [Header("Emerald Spells")]
+    [SerializeField] NetworkObject arrow;
+    [SerializeField] float arrowFireSpeed;
+
+    #endregion PROPS AND FIELDS
 
 
     #region CORE METHODS
@@ -216,7 +220,7 @@ public class Rebel : NetworkBehaviour
             ToggleCrouchRpc(false);
 
         // spawn Package (testing
-        if (Input.GetKeyDown(KeyCode.CapsLock)) SpawnPackageRpc();
+        if (Input.GetKeyDown(KeyCode.Alpha0)) SpawnPackageRpc();
     }
 
     bool TryJump()
@@ -403,7 +407,6 @@ public class Rebel : NetworkBehaviour
     bool DotNotForward(float dot)
     {
         return dot <= notForward;
-        //return dot <= 0.1f;
     }
 
 
@@ -572,14 +575,8 @@ public class Rebel : NetworkBehaviour
 
 
     #region ABILITIES
-    [Rpc(SendTo.Server)]
-    private void ThrowNadeRpc()
-    {
-        NetworkObject nadeTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(nade, OwnerClientId);
 
-        nadeTemp.GetComponent<NadeScript>().InitializeTransformRpc(VerticalRotator.transform.position + VerticalRotator.transform.forward * 2, VerticalRotator.transform.rotation);
-    }
-
+    #region sKT8 Abilities
     private void StartKTDash()
     {
         // if on cooldown or no input is given: return;
@@ -658,5 +655,45 @@ public class Rebel : NetworkBehaviour
         no.transform.position = WeaponSpace.position;
         no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * throwStrength;
     }
+    #endregion ABILITIES
+
+
+    #region Emerald Abilities
+    void StartPerch()
+    {
+
+    }
+
+    [Rpc(SendTo.Server)]
+    void StartEmeraldArrowRpc()
+    {
+        NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(arrow);
+        no.transform.position = WeaponSpace.position;
+        no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * arrowFireSpeed;
+        no.transform.forward = WeaponSpace.forward;
+    }
+
+    void StartEarthlyRootArrow()
+    {
+
+    }
+
+    void StartCommune()
+    {
+
+    }
+    #endregion Emerald Abilities
+
+
+    #region Test Abilities
+    [Rpc(SendTo.Server)]
+    private void ThrowNadeRpc()
+    {
+        NetworkObject nadeTemp = NetworkManager.SpawnManager.InstantiateAndSpawn(nade, OwnerClientId);
+
+        nadeTemp.GetComponent<NadeScript>().InitializeTransformRpc(VerticalRotator.transform.position + VerticalRotator.transform.forward * 2, VerticalRotator.transform.rotation);
+    }
+    #endregion Test Abilities
+
     #endregion ABILITIES
 }
