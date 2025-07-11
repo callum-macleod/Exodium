@@ -668,8 +668,7 @@ public class Rebel : NetworkBehaviour
     void StartEmeraldArrowRpc()
     {
         NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(arrow);
-        no.transform.position = WeaponSpace.position;
-        no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * arrowFireSpeed;
+        no.transform.position = VerticalRotator.position + VerticalRotator.forward * 1.2f;
         no.transform.forward = WeaponSpace.forward;
     }
 
