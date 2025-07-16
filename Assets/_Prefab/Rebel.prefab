@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4080243202
+  GlobalObjectIdHash: 3884698604
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e12345e2292215489728f27ab3e44b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rebel: 1
+  rebel: 2
   Keybinds: {fileID: 11400000, guid: 4a12335e8a826e648bf8347c5a04d11e, type: 2}
   HorizontalRotator: {fileID: 4365428620273654661}
   VerticalRotator: {fileID: 4587819814955486716}
@@ -409,6 +409,9 @@ MonoBehaviour:
   throwStrength: 10
   arrow: {fileID: -1361120243015969935, guid: 29e3a7c9e9bd1734da908eebd9f0286b, type: 3}
   arrowFireSpeed: 80
+  tank1Running: 0
+  currentRunDuration: 0
+  currentRunDir: {x: 0, y: 0, z: 0}
 --- !u!1 &2959098203030375826
 GameObject:
   m_ObjectHideFlags: 0

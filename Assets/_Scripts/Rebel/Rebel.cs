@@ -29,6 +29,13 @@ public class Rebel : NetworkBehaviour
             { AbililtyN.Ability3, nameof(StartEarthlyRootArrow) },
             { AbililtyN.Ability4, nameof(StartCommune) },
         } },
+
+        { Rebels.Tank1, new Dictionary<AbililtyN, string> () {
+            { AbililtyN.Ability1, nameof(StartRun) },
+            { AbililtyN.Ability2, nameof(StartEmeraldArrowRpc) },
+            { AbililtyN.Ability3, nameof(StartEarthlyRootArrow) },
+            { AbililtyN.Ability4, nameof(StartCommune) },
+        } },
     };
 
 
@@ -112,6 +119,11 @@ public class Rebel : NetworkBehaviour
     [Header("Emerald Spells")]
     [SerializeField] NetworkObject arrow;
     [SerializeField] float arrowFireSpeed;
+
+    [Header("Tank1 Spells")]
+    [SerializeField] private bool tank1Running;
+    [SerializeField] private float currentRunDuration;
+    [SerializeField] private Vector3 currentRunDir;
 
     #endregion PROPS AND FIELDS
 
@@ -287,6 +299,8 @@ public class Rebel : NetworkBehaviour
 
         if (kTDashing) KTDash();
         if (kTSkating) KTSkate();
+
+        if (tank1Running) ContinueRun();
     }
     #endregion CORE METHODS
 
@@ -302,7 +316,7 @@ public class Rebel : NetworkBehaviour
     // redistribute velocity
     void CalculateMovement()
     {
-        if (kTDashing) return;
+        if (kTDashing || tank1Running) return;
 
         // get velocity without y component
         Vector3 xzVelocity = new Vector3(rigidBody.velocity.x, 0, rigidBody.velocity.z);
@@ -683,6 +697,45 @@ public class Rebel : NetworkBehaviour
     }
     #endregion Emerald Abilities
 
+    #region BigAndRun
+    private void StartRun()
+    {
+        if (tank1Running)
+        {
+            EndRun();
+            return;
+        }
+
+                HorizontalRotator.GetComponent<Rotator>().enabled = false;
+        tank1Running = true;
+        currentRunDir = (HorizontalRotator.forward);
+    }
+
+    private void ContinueRun()
+    {
+        HorizontalRotator.forward = currentRunDir;
+
+
+        rigidBody.velocity = currentRunDir * 15;
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            currentRunDir = Vector3.Slerp(currentRunDir, -HorizontalRotator.right, Time.fixedDeltaTime);
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            currentRunDir = Vector3.Slerp(currentRunDir, HorizontalRotator.right, Time.fixedDeltaTime);
+        }
+    }
+
+    private void EndRun()
+    {
+        tank1Running = false;
+        HorizontalRotator.GetComponent<Rotator>().enabled = true;
+        HorizontalRotator.GetComponent<Rotator>().SetYRotation(-Vector3.SignedAngle(currentRunDir, Vector3.forward, Vector3.up));
+    }
+    #endregion
 
     #region Test Abilities
     [Rpc(SendTo.Server)]

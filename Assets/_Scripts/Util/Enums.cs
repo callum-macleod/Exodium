@@ -41,6 +41,7 @@ public enum Rebels
 {
     SKT8 = 0,
     Emerald,
+    Tank1,
 }
 
 public enum AbililtyN

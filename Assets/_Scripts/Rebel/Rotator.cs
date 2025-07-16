@@ -27,4 +27,9 @@ public class Rotator : NetworkBehaviour
         verticalRotator.localRotation = Quaternion.Euler(xRotation * sensitivity, 0, 0);
         transform.localRotation = Quaternion.Euler(0, yRotation * sensitivity, 0);
     }
+
+    public void SetYRotation(float newRot)
+    {
+        yRotation = newRot;
+    }
 }
