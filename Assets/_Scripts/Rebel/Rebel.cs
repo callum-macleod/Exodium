@@ -700,6 +700,8 @@ public class Rebel : NetworkBehaviour
     #region BigAndRun
     private void StartRun()
     {
+        Camera.main.transform.localPosition = new Vector3(0, 1.5f, -5);
+
         if (tank1Running)
         {
             EndRun();
@@ -734,6 +736,8 @@ public class Rebel : NetworkBehaviour
         tank1Running = false;
         HorizontalRotator.GetComponent<Rotator>().enabled = true;
         HorizontalRotator.GetComponent<Rotator>().SetYRotation(-Vector3.SignedAngle(currentRunDir, Vector3.forward, Vector3.up));
+
+        Camera.main.transform.localPosition = Vector3.zero;
     }
     #endregion
 
