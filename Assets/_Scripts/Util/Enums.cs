@@ -44,10 +44,17 @@ public enum Rebels
     Tank1,
 }
 
-public enum AbililtyN
+public enum AbilityN
 {
     Ability1 = 1,
     Ability2,
     Ability3,
     Ability4,
+}
+
+public enum Team
+{
+    Spectator = 0,
+    Red,
+    Blue
 }

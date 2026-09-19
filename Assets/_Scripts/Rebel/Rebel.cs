@@ -5,6 +5,84 @@ using Unity.Netcode;
 using UnityEngine.Animations;
 using TMPro;
 using System.Runtime.CompilerServices;
+using UnityEditor.Profiling.Memory.Experimental;
+
+
+public struct AbilityDef
+{
+    public AbilityDef(AbilityN abilityN, List<AbilityStage> stages)
+    {
+        AbilityN = abilityN;
+        AbilityStages = stages;
+    }
+
+    public AbilityN AbilityN;
+    public List<AbilityStage> AbilityStages;
+}
+
+public struct AbilityStage
+{
+    public AbilityStage(string abilityMethod, Func<KeyCode, bool> isAbilityTriggered)
+    {
+        AbilityMethod = abilityMethod;
+        IsAbilityTriggered = isAbilityTriggered;
+    }
+
+    public string AbilityMethod;
+    public Func<KeyCode, bool> IsAbilityTriggered;
+}
+
+public static class AbilityDefinitions
+{
+    public static List<AbilityDef> KTAbilityDefinitions = new List<AbilityDef>
+    {
+        new AbilityDef(AbilityN.Ability1, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartKTDash), key => {return Input.GetKeyDown(key); })
+        }),
+        new AbilityDef(AbilityN.Ability2, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartChargingKTSuperJump), key => Input.GetKeyDown(key)),
+            new AbilityStage(nameof(Rebel.StopChargingKTSuperJump), key => Input.GetKeyUp(key)),
+        }),
+        //new AbilityDef(AbilityN.Ability2, new List<AbilityStage>
+        //{
+        //    new AbilityStage(nameof(Rebel.ThrowKTJumpPadRpc), key => Input.GetKeyDown(key))
+        //}),
+        new AbilityDef(AbilityN.Ability3, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartKTSkate), key => Input.GetKeyDown(key))
+        }),
+    };
+
+    public static List<AbilityDef> EmeraldAbilityDefinitions = new List<AbilityDef>
+    {
+        new AbilityDef(AbilityN.Ability1, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartPerch), key => {return Input.GetKeyDown(key); })
+        }),
+        new AbilityDef(AbilityN.Ability2, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartEmeraldArrowRpc), key => Input.GetKeyDown(key))
+        }),
+        new AbilityDef(AbilityN.Ability3, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartEarthlyRootArrow), key => Input.GetKeyDown(key))
+        }),
+        new AbilityDef(AbilityN.Ability4, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartCommune), key => Input.GetKeyDown(key))
+        }),
+    };
+
+    public static List<AbilityDef> Tank1AbilityDefinitions = new List<AbilityDef>
+    {
+        new AbilityDef(AbilityN.Ability1, new List<AbilityStage>
+        {
+            new AbilityStage(nameof(Rebel.StartRun), key => {return Input.GetKeyDown(key); })
+        }),
+    };
+}
 
 public class Rebel : NetworkBehaviour
 {
@@ -12,30 +90,14 @@ public class Rebel : NetworkBehaviour
     #region PROPS AND FIELDS
     [Header("Rebel")]
     [SerializeField] public Rebels rebel = Rebels.SKT8;
+    [SerializeField] public Team Team = Team.Spectator;
     [SerializeField] KeybindsSO Keybinds;
 
-    Dictionary<Rebels, Dictionary<AbililtyN, string>> AbilityActions = new Dictionary<Rebels, Dictionary<AbililtyN, string>>()
+    Dictionary<Rebels, List<AbilityDef>> AbilityActions = new Dictionary<Rebels, List<AbilityDef>>()
     {
-        { Rebels.SKT8, new Dictionary<AbililtyN, string> () {
-            { AbililtyN.Ability1, nameof(StartKTDash) },
-            { AbililtyN.Ability2, nameof(ThrowKTJumpPadRpc) },
-            { AbililtyN.Ability3, nameof(StartKTSkate) },
-            { AbililtyN.Ability4, nameof(StartKTDash) },
-        } },
-
-        { Rebels.Emerald, new Dictionary<AbililtyN, string> () {
-            { AbililtyN.Ability1, nameof(StartPerch) },
-            { AbililtyN.Ability2, nameof(StartEmeraldArrowRpc) },
-            { AbililtyN.Ability3, nameof(StartEarthlyRootArrow) },
-            { AbililtyN.Ability4, nameof(StartCommune) },
-        } },
-
-        { Rebels.Tank1, new Dictionary<AbililtyN, string> () {
-            { AbililtyN.Ability1, nameof(StartRun) },
-            { AbililtyN.Ability2, nameof(StartEmeraldArrowRpc) },
-            { AbililtyN.Ability3, nameof(StartEarthlyRootArrow) },
-            { AbililtyN.Ability4, nameof(StartCommune) },
-        } },
+        { Rebels.SKT8, AbilityDefinitions.KTAbilityDefinitions },
+        { Rebels.Emerald, AbilityDefinitions.EmeraldAbilityDefinitions },
+        { Rebels.Tank1, AbilityDefinitions.Tank1AbilityDefinitions },
     };
 
 
@@ -112,7 +174,12 @@ public class Rebel : NetworkBehaviour
     [SerializeField] public GameObject sKT8Indicator;
     [SerializeField] float ktSkateMaxVMultiplier = 1.5f;
     [SerializeField] float ktSkateAccelerationMultiplier = 0.5f;
-    [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;    
+    [SerializeField] float ktSkateMaxVCompensationMultiplier = 0.5f;
+
+    bool ktChargingSuperJump = false;
+    float ktChargeButtonPressTime;
+    float ktChargeButtonReleaseTime;
+    float superJumpMaxMod = 2f;
 
     [SerializeField] public float throwStrength;
 
@@ -211,19 +278,28 @@ public class Rebel : NetworkBehaviour
             }
         }
 
-        // big burst of movement for debugging/testing
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-            rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
+        //// big burst of movement for debugging/testing
+        //if (Input.GetKeyDown(KeyCode.LeftShift))
+        //    rigidBody.AddForce(Move.normalized * 25f, ForceMode.Impulse);
 
-
-        //////////////////////////// GET ABILITY INPUTS /////////////
-        // foreach ability:
-            // if keybind exists && user has inputted key:
-                // invoke the associated ability
-        KeyCode key;
-        foreach (AbililtyN ability in Enum.GetValues(typeof(AbililtyN)))
-            if (TryGetKeybind(ability, out key) && Input.GetKeyDown(key))
-                Invoke(AbilityActions[rebel][ability], 0);
+        // foreach ability in rebel's abilityDefinitions
+        foreach (AbilityDef ability in AbilityActions[rebel])
+        {
+            // if keybind exists
+            if (TryGetKeybind(ability.AbilityN, out KeyCode key))
+            {
+                // foreach stage (e.g. KeyDown, KeyUp)
+                foreach (AbilityStage stage in ability.AbilityStages)
+                {
+                    // use predefined func to determine if the ability stage has been triggered (e.g. KeyDown, KeyUp)
+                    if (stage.IsAbilityTriggered(key))
+                    {
+                        // call method
+                        Invoke(stage.AbilityMethod, 0);
+                    }
+                }
+            }
+        }
 
         // crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -258,8 +334,14 @@ public class Rebel : NetworkBehaviour
 
     void Jump()
     {
+        float jumpForceMod = 1f;
+        if (!inAir)
+        {
+            jumpForceMod = Mathf.Clamp(ktChargeButtonReleaseTime - ktChargeButtonPressTime + 1, 0, superJumpMaxMod);
+            ktChargeButtonReleaseTime = ktChargeButtonPressTime = Time.time;
+        }
         rigidBody.velocity = Utils.RemoveY(rigidBody.velocity);
-        rigidBody.AddForce(jumpForce * rigidBody.mass * Vector3.up, ForceMode.Impulse);
+        rigidBody.AddForce(jumpForce * jumpForceMod * rigidBody.mass * Vector3.up, ForceMode.Impulse);
         timeOfLastJump = Time.time;
     }
 
@@ -270,7 +352,7 @@ public class Rebel : NetworkBehaviour
         p.transform.position = Vector3.up * 3f;
     }
 
-    private bool TryGetKeybind(AbililtyN abilityN, out KeyCode result)
+    private bool TryGetKeybind(AbilityN abilityN, out KeyCode result)
     {
         Keybinds.Keybinds.TryGetValue(rebel, out KeybindsBaseSO bindings);
         return bindings.AbilityKeybinds.TryGetValue(abilityN, out result);
@@ -591,7 +673,7 @@ public class Rebel : NetworkBehaviour
     #region ABILITIES
 
     #region sKT8 Abilities
-    private void StartKTDash()
+    internal void StartKTDash()
     {
         // if on cooldown or no input is given: return;
         if (currentKTDashCD > 0 || (Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal"))) == 0) return;
@@ -627,7 +709,7 @@ public class Rebel : NetworkBehaviour
         currentKTDashDuration = 0;
     }
 
-    private void StartKTSkate()
+    internal void StartKTSkate()
     {
         if (kTSkating)
         {
@@ -663,42 +745,56 @@ public class Rebel : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    private void ThrowKTJumpPadRpc()
+    internal void ThrowKTJumpPadRpc()
     {
         NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(KTLaunchPad);
         no.transform.position = WeaponSpace.position;
         no.GetComponent<Rigidbody>().velocity = rigidBody.velocity + WeaponSpace.forward * throwStrength;
     }
+
+
+    internal void StartChargingKTSuperJump()
+    {
+        ktChargingSuperJump = true;
+        ktChargeButtonPressTime = Time.time;
+        ktChargeButtonReleaseTime = Time.time;
+    }
+
+    internal void StopChargingKTSuperJump()
+    {
+        ktChargingSuperJump = false;
+        ktChargeButtonReleaseTime = Time.time;
+    }
     #endregion ABILITIES
 
 
     #region Emerald Abilities
-    void StartPerch()
+    internal void StartPerch()
     {
 
     }
 
     [Rpc(SendTo.Server)]
-    void StartEmeraldArrowRpc()
+    internal void StartEmeraldArrowRpc()
     {
         NetworkObject no = NetworkManager.SpawnManager.InstantiateAndSpawn(arrow);
         no.transform.position = VerticalRotator.position + VerticalRotator.forward * 1.2f;
         no.transform.forward = WeaponSpace.forward;
     }
 
-    void StartEarthlyRootArrow()
+    internal void StartEarthlyRootArrow()
     {
 
     }
 
-    void StartCommune()
+    internal void StartCommune()
     {
 
     }
     #endregion Emerald Abilities
 
     #region BigAndRun
-    private void StartRun()
+    internal void StartRun()
     {
         Camera.main.transform.localPosition = new Vector3(0, 1.5f, -5);
 

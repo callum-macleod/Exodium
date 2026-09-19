@@ -30,7 +30,7 @@ public class Arrow : NetworkBehaviour
     void Update()
     {
         // stop guiding when you release the ability's keybind
-        if (guiding && Input.GetKeyUp(keybinds.AbilityKeybinds[AbililtyN.Ability2])) guiding = false;
+        if (guiding && Input.GetKeyUp(keybinds.AbilityKeybinds[AbilityN.Ability2])) guiding = false;
 
         // if guiding: calculate horizontal velocity
         if (guiding) currentHorizontalVel = (Utils.ComponentWiseMult(GetRebelHorizontal(), Vector3.forward + Vector3.right) * speed);
@@ -63,5 +63,6 @@ public class Arrow : NetworkBehaviour
         no.transform.position = collision.contacts[0].point;
 
         NetworkObject.Despawn();
+        //Destroy(gameObject);
     }
 }

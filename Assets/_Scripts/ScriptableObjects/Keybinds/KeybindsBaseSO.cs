@@ -5,5 +5,5 @@ using UnityEngine;
 
 public class KeybindsBaseSO : ScriptableObject
 {
-    [SerializeField] public SerializedDictionary<AbililtyN, KeyCode> AbilityKeybinds;
+    [SerializeField] public SerializedDictionary<AbilityN, KeyCode> AbilityKeybinds;
 }

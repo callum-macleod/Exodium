@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using System.Linq;
+using UnityEngine.Windows.Speech;
+using Unity.VisualScripting;
 
 public class MatchMgr : NetworkBehaviour
 {
@@ -18,11 +20,13 @@ public class MatchMgr : NetworkBehaviour
         }
     }
 
-    [SerializeField] List<Rebel> rebels = new List<Rebel>();
-    public bool RecievedLocalRebel { get; private set; } = false;
-
     public static MatchMgr Instance;
     private void Start() { Instance = this; }
+
+    [SerializeField] List<Rebel> rebels = new List<Rebel>();
+    Dictionary<Team, List<ulong>> teams = new Dictionary<Team, List<ulong>>();
+
+    public bool RecievedLocalRebel { get; private set; } = false;
 
     public override void OnNetworkSpawn()
     {
@@ -68,6 +72,8 @@ public class MatchMgr : NetworkBehaviour
         {
             // if not yet spawned OR is server: add rebel and update clients
             rebels.Add(rebel);
+            UpdateTeamsWithRebel(rebel, rebel.Team);
+
 
             // send rpc to clients
             if (IsSpawned) UpdateClientRebelList();
@@ -80,9 +86,10 @@ public class MatchMgr : NetworkBehaviour
     public void RegisterRebelRpc(NetworkObjectReference nObjRef)
     {
         nObjRef.TryGet(out NetworkObject nObj);
-        Rebel t = nObj.GetComponent<Rebel>();
-        print($"{{SRPC}} OCID: {OwnerClientId} => Recieving Rebel {t.NetworkObjectId} for registration");
-        rebels.Add(t);
+        Rebel r = nObj.GetComponent<Rebel>();
+        print($"{{SRPC}} OCID: {OwnerClientId} => Recieving Rebel {r.NetworkObjectId} for registration");
+        rebels.Add(r);
+        UpdateTeamsWithRebel(r, r.Team);
 
         UpdateClientRebelList();
     }
@@ -93,10 +100,10 @@ public class MatchMgr : NetworkBehaviour
 
 
         List<NetworkObjectReference> nObjRefs = new();
-        foreach (Rebel t in rebels)
+        foreach (Rebel r in rebels)
         {
-            NetworkObjectReference n = new NetworkObjectReference(t.NetworkObject);
-            nObjRefs.Add(new NetworkObjectReference(t.NetworkObject));
+            NetworkObjectReference n = new NetworkObjectReference(r.NetworkObject);
+            nObjRefs.Add(new NetworkObjectReference(r.NetworkObject));
         }
 
         UpdateClientRebelListRpc(nObjRefs.ToArray());
@@ -115,5 +122,11 @@ public class MatchMgr : NetworkBehaviour
         }
 
         rebels = t;
+    }
+
+    void UpdateTeamsWithRebel(Rebel rebel, Team newTeam)
+    {
+        //if ()
+        //if (teams[rebel.Team].Contains(rebel.NetworkObjectId))
     }
 }
